@@ -25,7 +25,7 @@ user='proj-1',
 passwd='admin',
 database='proj-1'
 
-# 이후 회원가입 정보 MySQL에서 확인 가능
+#이후 회원가입 정보 MySQL에서 확인 가능
 
 USE `proj-1`;
 SELECT * FROM users;
