@@ -1,0 +1,54 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+    <meta charset="UTF-8">
+    <title>내 이상형 찾기</title>
+</head>
+<body>
+    <h2>💘 내 이상형 찾기</h2>
+
+    <form method="POST">
+        <label>성별:
+            <select name="gender">
+                <option value="">전체</option>
+                <option value="남자">남자</option>
+                <option value="여자">여자</option>
+            </select>
+        </label>
+
+        <label>동물 아이콘:
+            <select name="animal">
+                <option value="">전체</option>
+                <option value="사자">🦁 사자</option>
+                <option value="토끼">🐰 토끼</option>
+                <option value="고양이">🐱 고양이</option>
+                <!-- 필요하면 나머지 추가 -->
+            </select>
+        </label>
+
+        <button type="submit">🔍 탐색</button>
+    </form>
+
+    <hr>
+
+    {% if profiles %}
+        {% for p in profiles %}
+            <div style="border:1px solid gray; margin:10px; padding:10px;">
+                <p><strong>닉네임:</strong> {{ p[2] }} ({{ p[12] }})</p>
+                <p><strong>동물:</strong> {{ p[5] }} / <strong>MBTI:</strong> {{ p[3] }}</p>
+                <p><strong>나이:</strong> {{ p[4] }}세 / <strong>사는 곳:</strong> {{ p[6] }}</p>
+
+                {% if p[1] in liked_users %}
+                    ❤️ 이미 좋아요함
+                {% else %}
+                    <a href="{{ url_for('like_user', to_email=p[1]) }}">💖 좋아요</a>
+                {% endif %}
+            </div>
+        {% endfor %}
+    {% else %}
+        <p>🔍 조건에 맞는 사용자가 없습니다.</p>
+    {% endif %}
+
+    <a href="{{ url_for('dashboard') }}">← 대시보드로 돌아가기</a>
+</body>
+</html>

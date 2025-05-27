@@ -1,0 +1,66 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+  <meta charset="UTF-8">
+  <title>채팅</title>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/socket.io/4.5.4/socket.io.min.js"
+          integrity="sha512-..." crossorigin="anonymous" referrerpolicy="no-referrer"></script>
+</head>
+<body>
+  <h2>💬 {{ user_email }}님과의 채팅</h2>
+
+  <div id="chat-box">
+    {% for sender, content, time in messages %}
+      <p><strong>{{ sender }}:</strong> {{ content }} ({{ time }})</p>
+    {% endfor %}
+  </div>
+
+  <form id="chat-form">
+    <input id="msg-input" type="text" name="message" placeholder="메시지 입력" required autocomplete="off">
+    <button type="submit">전송</button>
+  </form>
+
+  <br>
+  <form action="{{ url_for('matches') }}" method="GET">
+    <button type="submit">🔙 채팅방 나가기</button>
+  </form>
+
+  <form action="{{ url_for('unmatch', user_email=user_email) }}" method="POST" style="margin-top:10px;">
+    <button type="submit" onclick="return confirm('정말 매칭을 취소하시겠습니까?')">❌ 매칭 취소</button>
+  </form>
+
+  <script>
+    const socket = io();
+    const myEmail = "{{ my_email }}";
+    const userEmail = "{{ user_email }}";
+    const room = [myEmail, userEmail].sort().join("_");
+
+    // 방으로 입장
+    socket.emit('join', { my_email: myEmail, user_email: userEmail });
+
+    // 전송 폼 핸들링
+    document.getElementById('chat-form').addEventListener('submit', function(e) {
+      e.preventDefault();
+      const input = document.getElementById('msg-input');
+      const msg = input.value.trim();
+      if (!msg) return;
+      socket.emit('send_message', {
+        my_email: myEmail,
+        user_email: userEmail,
+        message: msg
+      });
+      input.value = '';
+    });
+
+    // 서버로부터 도착한 메시지 처리
+    socket.on('receive_message', function(data) {
+      const box = document.getElementById('chat-box');
+      const p = document.createElement('p');
+      p.innerHTML = `<strong>${data.sender}:</strong> ${data.content} (${data.timestamp})`;
+      box.appendChild(p);
+      // 새 메시지 보이면 스크롤 자동으로
+      box.scrollTop = box.scrollHeight;
+    });
+  </script>
+</body>
+</html>

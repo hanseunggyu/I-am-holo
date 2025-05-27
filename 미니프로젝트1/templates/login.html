@@ -1,16 +1,13 @@
 <!DOCTYPE html>
-<html lang="ko">
-<head>
-    <meta charset="UTF-8">
-    <title>로그인</title>
-</head>
+<html>
+<head><title>로그인</title></head>
 <body>
-    <h2>🔐 로그인</h2>
-    <form action="{{ url_for('login') }}" method="POST">
-        <label>이메일: <input type="email" name="email" required></label><br><br>
-        <label>비밀번호: <input type="password" name="password" required></label><br><br>
-        <button type="submit">로그인</button>
-    </form>
-    <p>계정이 없으신가요? <a href="{{ url_for('register') }}">회원가입</a></p>
+  <h2>로그인</h2>
+  <form method="POST" action="/login">
+    이메일: <input type="text" name="email"><br>
+    비밀번호: <input type="password" name="password"><br>
+    <input type="submit" value="로그인">
+  </form>
+  <a href="/register">회원가입</a>
 </body>
 </html>

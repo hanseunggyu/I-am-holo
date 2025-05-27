@@ -1,0 +1,16 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+    <meta charset="UTF-8">
+    <title>메인 대시보드</title>
+</head>
+<body>
+    <h2>🎉 환영합니다 {{ email }}님!</h2>
+
+    <ul>
+        <li><a href="{{ url_for('explore') }}">💘 내 이상형 찾기</a></li>
+        <li><a href="{{ url_for('matches') }}">💑 매칭된 사람 보기</a></li>
+        <li><a href="{{ url_for('logout') }}">🚪 로그아웃</a></li>
+    </ul>
+</body>
+</html>
