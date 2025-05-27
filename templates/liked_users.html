@@ -1,0 +1,41 @@
+{% extends "base.html" %}
+{% block title %}내가 좋아요한 사람들{% endblock %}
+{% block content %}
+
+<!-- 왼쪽 패널 -->
+<div class="panel left">
+  <h2>❤️ 좋아요한 사람</h2>
+  <p>내가 관심 있는 사람들의 목록입니다</p>
+  <img src="https://emojicdn.elk.sh/💘?style=apple" alt="heart" style="width: 80px; margin-top: 30px;">
+</div>
+
+<!-- 오른쪽 패널 -->
+<div class="panel right">
+  <h2 class="mb-4">💖 내가 좋아요한 사람</h2>
+
+  {% if liked %}
+    <div class="d-flex flex-column gap-3">
+      {% for p in liked %}
+        <div class="card shadow-sm" style="border-radius: 15px;">
+          <div class="card-body">
+            <h5 class="card-title">🐾 닉네임: {{ p[0] }}</h5>
+            <p class="card-text mb-2">
+              <strong>MBTI:</strong> {{ p[1] }} / <strong>나이:</strong> {{ p[2] }}<br>
+              <strong>사는 곳:</strong> {{ p[3] }} / <strong>동물:</strong> {{ p[4] }}<br>
+              📷 인스타: {{ p[5] }}<br>
+              📞 연락처: {{ p[6] }}
+            </p>
+          </div>
+        </div>
+      {% endfor %}
+    </div>
+  {% else %}
+    <p class="text-muted">😢 아직 좋아요한 사람이 없습니다.</p>
+  {% endif %}
+
+  <div class="text-center mt-4">
+    <a href="{{ url_for('dashboard') }}" class="btn btn-secondary">← 대시보드로 돌아가기</a>
+  </div>
+</div>
+
+{% endblock %}

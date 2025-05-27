@@ -158,6 +158,29 @@ def profile_edit():
     conn.close()
     return render_template("edit_profile.html", user=user)
 
+@app.route('/liked')
+def liked_users():
+    if 'email' not in session:
+        return redirect(url_for('home'))
+
+    email = session['email']
+    conn = get_connection()
+    cursor = conn.cursor()
+
+    cursor.execute("""
+        SELECT p.nickname, p.mbti, p.age, p.location, p.animal_icon, p.instagram, p.phone, p.user_email
+        FROM profiles p
+        JOIN likes l ON p.user_email = l.to_user
+        WHERE l.from_user = %s
+    """, (email,))
+
+    liked = cursor.fetchall()
+    cursor.close()
+    conn.close()
+
+    return render_template("liked_users.html", liked=liked)
+
+
 @app.route('/explore', methods=['GET', 'POST'])
 def explore():
     if 'email' not in session:
