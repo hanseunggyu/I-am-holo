@@ -3,14 +3,17 @@ from auth import register_user, login_user
 from db import get_connection
 from flask_socketio import SocketIO, join_room, emit
 from datetime import datetime
+
 #####
 from chat import chat_bp
 ######
+
 
 app = Flask(__name__)
 app.secret_key = "b'\xd8\x03\xfaW\xca\x01\x13\xf3..."  # 세션 키
 
 app.register_blueprint(chat_bp)
+
 
 # SocketIO 초기화
 socketio = SocketIO(app, cors_allowed_origins="*")

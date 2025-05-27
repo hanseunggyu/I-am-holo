@@ -1,3 +1,5 @@
+
+
 [MySQL 계정 및 데이터베이스 설정]
 -- 1. 사용자 생성 (비밀번호: admin)
 CREATE USER 'proj-1'@'localhost' IDENTIFIED BY 'admin';
@@ -75,3 +77,4 @@ SELECT * FROM users;
 SELECT * FROM profiles;
 SELECT * FROM likes;
 SELECT * FROM messages;
+>>>>>>> 592b6b7caaab1214261e40bc1725465fa37d6c1b
