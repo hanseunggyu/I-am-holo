@@ -99,6 +99,88 @@ def logout():
     session.clear()
     return redirect(url_for('home'))
 
+@app.route('/profile')
+def profile():
+    if 'email' not in session:
+        return redirect(url_for('home'))
+
+    email = session['email']
+    conn = get_connection()
+    cursor = conn.cursor(dictionary=True)
+    cursor.execute("SELECT * FROM profiles WHERE user_email = %s", (email,))
+    user = cursor.fetchone()
+    cursor.close()
+    conn.close()
+
+    return render_template('profile.html', user=user)
+
+
+@app.route('/profile_edit', methods=['GET', 'POST'], endpoint='edit_profile')
+def profile_edit():
+    if 'email' not in session:
+        return redirect(url_for('home'))
+
+    email = session['email']
+    conn = get_connection()
+    cursor = conn.cursor(dictionary=True)
+
+    if request.method == 'POST':
+        nickname = request.form['nickname']
+        mbti = request.form['mbti']
+        age = request.form['age']
+        gender = request.form['gender']
+        job = request.form['job']
+        location = request.form['location']
+        religion = request.form['religion']
+        dream = request.form['dream']
+        love_style = request.form['love_style']
+        preference = request.form['preference']
+        keywords = request.form['keywords']
+        phone = request.form['phone']
+        instagram = request.form['instagram']
+
+        cursor.execute("""
+            UPDATE profiles
+            SET nickname=%s, mbti=%s, age=%s, gender=%s, job=%s, location=%s,
+                religion=%s, dream=%s, love_style=%s, preference=%s, keywords=%s,
+                phone=%s, instagram=%s
+            WHERE user_email=%s
+        """, (nickname, mbti, age, gender, job, location, religion,
+              dream, love_style, preference, keywords, phone, instagram, email))
+        conn.commit()
+        cursor.close()
+        conn.close()
+        return redirect(url_for('profile'))
+
+    cursor.execute("SELECT * FROM profiles WHERE user_email = %s", (email,))
+    user = cursor.fetchone()
+    cursor.close()
+    conn.close()
+    return render_template("edit_profile.html", user=user)
+
+@app.route('/liked')
+def liked_users():
+    if 'email' not in session:
+        return redirect(url_for('home'))
+
+    email = session['email']
+    conn = get_connection()
+    cursor = conn.cursor()
+
+    cursor.execute("""
+        SELECT p.nickname, p.mbti, p.age, p.location, p.animal_icon, p.instagram, p.phone, p.user_email
+        FROM profiles p
+        JOIN likes l ON p.user_email = l.to_user
+        WHERE l.from_user = %s
+    """, (email,))
+
+    liked = cursor.fetchall()
+    cursor.close()
+    conn.close()
+
+    return render_template("liked_users.html", liked=liked)
+
+
 @app.route('/explore', methods=['GET', 'POST'])
 def explore():
     if 'email' not in session:

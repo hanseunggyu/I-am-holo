@@ -1,0 +1,46 @@
+{% extends "base.html" %}
+{% block title %}내 프로필{% endblock %}
+{% block content %}
+
+<!-- 왼쪽 안내 -->
+<div class="panel left">
+  <h2>👤 내 프로필</h2>
+  <p>나를 표현하는 공간입니다</p>
+  <img src="https://emojicdn.elk.sh/👀?style=apple" style="width: 80px; margin-top: 30px;">
+</div>
+
+<!-- 오른쪽 프로필 정보 -->
+<div class="panel right">
+
+  <!-- 제목 + 수정 버튼 -->
+  <div class="d-flex justify-content-between align-items-center mb-4">
+    <h2 class="fw-bold" style="font-size: 24px; margin: 0;">
+      {{ user.nickname }}님의 프로필
+    </h2>
+    <a href="{{ url_for('edit_profile') }}" class="btn btn-outline-secondary d-flex align-items-center" style="font-size: 14px; padding: 6px 12px;">
+      ✏️ <span class="ms-1">수정</span>
+    </a>
+  </div>
+
+  <!-- 정보 목록 -->
+  <ul class="list-group mb-4">
+    <li class="list-group-item"><strong>나이:</strong> {{ user.age }} / {{ user.gender }}</li>
+    <li class="list-group-item"><strong>MBTI:</strong> {{ user.mbti }}</li>
+    <li class="list-group-item"><strong>사는 곳:</strong> {{ user.location }}</li>
+    <li class="list-group-item"><strong>직업:</strong> {{ user.job }}</li>
+    <li class="list-group-item"><strong>종교:</strong> {{ user.religion }}</li>
+    <li class="list-group-item"><strong>꿈:</strong> {{ user.dream }}</li>
+    <li class="list-group-item"><strong>연애관:</strong> {{ user.love_style }}</li>
+    <li class="list-group-item"><strong>취향:</strong> {{ user.preference }}</li>
+    <li class="list-group-item"><strong>키워드:</strong> {{ user.keywords }}</li>
+    <li class="list-group-item"><strong>연락처:</strong> {{ user.phone }}</li>
+    <li class="list-group-item"><strong>인스타:</strong> {{ user.instagram }}</li>
+  </ul>
+
+  <!-- 대시보드 이동 -->
+  <div class="d-flex gap-2">
+    <a href="{{ url_for('dashboard') }}" class="btn btn-dark">← 대시보드</a>
+  </div>
+
+</div>
+{% endblock %}
