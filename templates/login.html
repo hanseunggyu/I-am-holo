@@ -1,0 +1,24 @@
+{% extends "base.html" %}
+{% block title %}로그인{% endblock %}
+
+{% block content %}
+<!-- 왼쪽 패널: 설명 -->
+<div class="panel left">
+  <h2>Welcome Back!</h2>
+  <p>다시 만난 당신,<br>반가워요 😊<br><br>로그인하고 소개팅을 시작해보세요!</p>
+  <img src="https://emojicdn.elk.sh/💌?style=apple" alt="love" style="width: 80px; margin-top: 30px;">
+</div>
+
+<!-- 오른쪽 패널: 로그인 폼 -->
+<div class="panel right">
+  <h2>🔐 로그인</h2>
+  <form method="POST" action="/login" class="w-100" style="max-width: 350px; margin: auto;">
+    <input type="text" name="email" placeholder="이메일" class="form-control" required>
+    <input type="password" name="password" placeholder="비밀번호" class="form-control" required>
+    <button type="submit" class="btn btn-purple w-100 mt-3">로그인</button>
+  </form>
+  <div class="text-center mt-3">
+    <a href="/register" class="text-link">👉 아직 회원이 아니신가요?</a>
+  </div>
+</div>
+{% endblock %}

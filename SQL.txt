@@ -1,0 +1,77 @@
+[MySQL 계정 및 데이터베이스 설정]
+-- 1. 사용자 생성 (비밀번호: admin)
+CREATE USER 'proj-1'@'localhost' IDENTIFIED BY 'admin';
+
+-- 2. 데이터베이스 생성
+CREATE DATABASE `proj-1`
+  CHARACTER SET utf8mb4
+  COLLATE utf8mb4_general_ci;
+
+-- 3. 사용자에게 권한 부여
+GRANT ALL PRIVILEGES ON `proj-1`.* TO 'proj-1'@'localhost';
+
+-- 4. 권한 적용
+FLUSH PRIVILEGES;
+
+///
+
+[데이터베이스 선택]
+USE `proj-1`;
+
+
+[1. users 테이블 생성]
+CREATE TABLE IF NOT EXISTS users (
+  id INT AUTO_INCREMENT PRIMARY KEY,
+  email VARCHAR(255) UNIQUE NOT NULL,
+  password VARCHAR(255) NOT NULL,
+  created_at DATETIME DEFAULT CURRENT_TIMESTAMP
+);
+
+
+[2. profiles 테이블 생성]
+CREATE TABLE profiles (
+  id INT AUTO_INCREMENT PRIMARY KEY,
+  user_email VARCHAR(255) NOT NULL,
+  nickname VARCHAR(50),           -- 닉네임은 이제 여기로 이동
+  animal_icon VARCHAR(10),
+  mbti VARCHAR(4),
+  age INT,
+  job VARCHAR(100),
+  location VARCHAR(100),
+  religion VARCHAR(50),
+  dream TEXT,
+  love_style TEXT,
+  preference TEXT,
+  keywords TEXT,
+  gender VARCHAR(10),
+  phone VARCHAR(30),
+  instagram VARCHAR(100),
+  FOREIGN KEY (user_email) REFERENCES users(email) ON DELETE CASCADE
+);
+
+
+[3. likes 테이블 생성 (좋아요)]
+CREATE TABLE likes (
+  id INT AUTO_INCREMENT PRIMARY KEY,
+  from_user VARCHAR(255) NOT NULL,
+  to_user VARCHAR(255) NOT NULL,
+  created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+  UNIQUE (from_user, to_user)
+);
+
+
+[4. messages 테이블 생성 (채팅 메시지)]
+CREATE TABLE messages (
+  id INT AUTO_INCREMENT PRIMARY KEY,
+  sender VARCHAR(255),
+  receiver VARCHAR(255),
+  content TEXT,
+  timestamp DATETIME DEFAULT CURRENT_TIMESTAMP
+);
+
+
+[확인용 쿼리]
+SELECT * FROM users;
+SELECT * FROM profiles;
+SELECT * FROM likes;
+SELECT * FROM messages;
