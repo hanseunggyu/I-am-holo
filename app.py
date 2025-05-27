@@ -114,7 +114,6 @@ def profile():
 
     return render_template('profile.html', user=user)
 
-
 @app.route('/profile_edit', methods=['GET', 'POST'], endpoint='edit_profile')
 def profile_edit():
     if 'email' not in session:
@@ -139,14 +138,18 @@ def profile_edit():
         phone = request.form['phone']
         instagram = request.form['instagram']
 
+        # 프로필 이미지 URL은 선택적이므로 None으로 설정
+        profile_img_url = request.form.get('profile_img_url') or None
+
+
         cursor.execute("""
             UPDATE profiles
             SET nickname=%s, mbti=%s, age=%s, gender=%s, job=%s, location=%s,
                 religion=%s, dream=%s, love_style=%s, preference=%s, keywords=%s,
-                phone=%s, instagram=%s
+                phone=%s, instagram=%s, profile_img=%s
             WHERE user_email=%s
         """, (nickname, mbti, age, gender, job, location, religion,
-              dream, love_style, preference, keywords, phone, instagram, email))
+              dream, love_style, preference, keywords, phone, instagram, profile_img_url, email))
         conn.commit()
         cursor.close()
         conn.close()

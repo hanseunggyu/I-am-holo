@@ -10,7 +10,9 @@
 
 <div class="panel right">
   <h2 class="mb-4">내 정보 수정</h2>
-  <form method="POST" class="row g-3">
+
+  <!-- ✅ 파일 업로드까지 포함된 하나의 form -->
+  <form method="POST" enctype="multipart/form-data" class="row g-3">
 
     <div class="col-md-6">
       <label class="form-label">닉네임</label>
@@ -30,8 +32,8 @@
     <div class="col-md-6">
       <label class="form-label">성별</label>
       <select name="gender" class="form-select">
-        <option value="남자" {% if user.gender == "남자" %}selected{% endif %}>남자</option>
-        <option value="여자" {% if user.gender == "여자" %}selected{% endif %}>여자</option>
+        <option value="남자" {% if user.gender=="남자" %}selected{% endif %}>남자</option>
+        <option value="여자" {% if user.gender=="여자" %}selected{% endif %}>여자</option>
       </select>
     </div>
 
@@ -78,6 +80,12 @@
     <div class="col-md-12">
       <label class="form-label">취향</label>
       <textarea name="preference" class="form-control">{{ user.preference }}</textarea>
+    </div>
+
+    <!-- ✅ 프로필 이미지 업로드 -->
+    <div class="col-md-12">
+      <label class="form-label">프로필 이미지 URL</label>
+      <input type="text" name="profile_img_url" value="{{ user.profile_img }}" class="form-control" placeholder="https://example.com/image.jpg">
     </div>
 
     <div class="text-center mt-3">

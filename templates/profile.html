@@ -22,6 +22,13 @@
     </a>
   </div>
 
+  <!-- 프로필 이미지 -->
+  {% if user.profile_img %}
+    <img src="{{ user.profile_img }}" alt="프로필 이미지" style="width: 150px; border-radius: 50%; margin-bottom: 20px;">
+  {% else %}
+    <p class="text-muted">📸 프로필 이미지가 없습니다.</p>
+  {% endif %}
+
   <!-- 정보 목록 -->
   <ul class="list-group mb-4">
     <li class="list-group-item"><strong>나이:</strong> {{ user.age }} / {{ user.gender }}</li>
@@ -43,4 +50,12 @@
   </div>
 
 </div>
+
+<!-- 둥근 박스용 스타일 -->
+<style>
+.list-group-mb-4.rounded-pill {
+  border-radius: 100px !important;
+}
+</style>
+
 {% endblock %}
