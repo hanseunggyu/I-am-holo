@@ -1,0 +1,31 @@
+{% extends "base.html" %}
+{% block title %}채팅 목록{% endblock %}
+
+{% block content %}
+<!-- 왼쪽 설명 패널 -->
+<div class="panel left">
+  <h2>💌 채팅 목록</h2>
+  <p>소중한 인연들과의<br>대화를 이어가보세요!</p>
+  <img src="https://emojicdn.elk.sh/💌?style=apple" alt="chat" style="width: 80px; margin-top: 30px;">
+</div>
+
+<!-- 오른쪽 목록 패널 -->
+<div class="panel right">
+  <h2>🗂 대화 상대</h2>
+
+  {% if matches %}
+    {% for m in matches %}
+      <div class="mb-3 p-3" style="background-color: var(--neu-1); border-radius: 15px; box-shadow: inset 2px 2px 6px var(--neu-2), inset -2px -2px 6px var(--white);">
+        <div style="font-weight: 600; font-size: 16px;">👤 {{ m[0] }}</div>
+        <a class="text-link" href="{{ url_for('chat', user_email=m[7]) }}">💬 채팅하러 가기</a>
+      </div>
+    {% endfor %}
+  {% else %}
+    <p class="text-muted mt-4">😢 채팅 상대가 아직 없습니다.</p>
+  {% endif %}
+
+  <div class="mt-4">
+    <a href="{{ url_for('dashboard') }}" class="text-link">← 대시보드로 돌아가기</a>
+  </div>
+</div>
+{% endblock %}
