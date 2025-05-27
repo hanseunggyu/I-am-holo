@@ -1,0 +1,105 @@
+{% extends "base.html" %}
+{% block title %}프로필 작성{% endblock %}
+
+{% block content %}
+<!-- 왼쪽 패널: 설명 -->
+<div class="panel left">
+  <h2>🌟 프로필 작성</h2>
+  <p>당신을 소개해보세요!<br>취향과 성격, 목표까지</p>
+  <img src="https://emojicdn.elk.sh/📝?style=apple" alt="온보딩" style="width: 80px; margin-top: 30px;">
+</div>
+
+<!-- 오른쪽 패널: 폼 입력 -->
+<div class="panel right">
+  <h2 class="mb-4">나를 표현하는 프로필</h2>
+  <form method="POST" class="row g-3">
+    <div class="col-md-6">
+      <label class="form-label">동물 아이콘</label>
+      <select name="animal" class="form-select">
+        <option value="사자">🦁 사자</option>
+        <option value="원숭이">🐒 원숭이</option>
+        <option value="공룡">🦖 공룡</option>
+        <option value="여우">🦊 여우</option>
+        <option value="토끼">🐰 토끼</option>
+        <option value="강아지">🐶 강아지</option>
+        <option value="고양이">🐱 고양이</option>
+        <option value="다람쥐">🐿️ 다람쥐</option>
+        <option value="사슴">🦌 사슴</option>
+        <option value="곰">🐻 곰</option>
+      </select>
+    </div>
+
+    <div class="col-md-6">
+      <label class="form-label">성별</label>
+      <select name="gender" class="form-select" required>
+        <option value="남자">남자</option>
+        <option value="여자">여자</option>
+      </select>
+    </div>
+
+    <div class="col-md-6">
+      <label class="form-label">닉네임</label>
+      <input type="text" name="nickname" class="form-control" required>
+    </div>
+
+    <div class="col-md-6">
+      <label class="form-label">MBTI</label>
+      <input type="text" name="mbti" class="form-control">
+    </div>
+
+    <div class="col-md-6">
+      <label class="form-label">나이</label>
+      <input type="number" name="age" class="form-control">
+    </div>
+
+    <div class="col-md-6">
+      <label class="form-label">직업</label>
+      <input type="text" name="job" class="form-control">
+    </div>
+
+    <div class="col-md-6">
+      <label class="form-label">사는 곳</label>
+      <input type="text" name="location" class="form-control">
+    </div>
+
+    <div class="col-md-6">
+      <label class="form-label">종교</label>
+      <input type="text" name="religion" class="form-control">
+    </div>
+
+    <div class="col-md-12">
+      <label class="form-label">꿈/목표</label>
+      <textarea name="dream" class="form-control" rows="2"></textarea>
+    </div>
+
+    <div class="col-md-12">
+      <label class="form-label">연애관</label>
+      <textarea name="love_style" class="form-control" rows="2"></textarea>
+    </div>
+
+    <div class="col-md-12">
+      <label class="form-label">취향</label>
+      <textarea name="preference" class="form-control" rows="2"></textarea>
+    </div>
+
+    <div class="col-md-12">
+      <label class="form-label">나를 표현하는 키워드</label>
+      <input type="text" name="keywords" class="form-control">
+    </div>
+
+    <div class="col-md-6">
+      <label class="form-label">연락처</label>
+      <input type="text" name="phone" class="form-control" required>
+    </div>
+
+    <div class="col-md-6">
+      <label class="form-label">인스타그램 ID</label>
+      <input type="text" name="instagram" class="form-control" required>
+    </div>
+
+    <div class="col-12 text-center mt-3">
+      <input type="submit" value="제출하기" class="btn btn-purple px-5">
+    </div>
+  </form>
+</div>
+{% endblock %}

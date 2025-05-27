@@ -1,0 +1,40 @@
+{% extends "base.html" %}
+{% block title %}회원가입{% endblock %}
+
+{% block content %}
+<!-- 왼쪽 패널: 설명 -->
+<div class="panel left">
+  <h2>회원가입</h2>
+  <p>새로운 인연을<br>지금 바로 시작해보세요 </p>
+  <img src="https://emojicdn.elk.sh/🧡?style=apple" alt="heart" style="width: 80px; margin-top: 30px;">
+</div>
+
+<!-- 오른쪽 패널: 가입 폼 -->
+<div class="panel right">
+  <h2 class="mb-4">📝 회원가입</h2>
+  <form method="POST" class="mx-auto" style="max-width: 350px;">
+    <div class="mb-3">
+      <label class="form-label">이메일</label>
+      <input type="text" name="email" class="form-control" required>
+    </div>
+
+    <div class="mb-3">
+      <label class="form-label">비밀번호</label>
+      <input type="password" name="password" class="form-control" required>
+    </div>
+
+    <div class="mb-3">
+      <label class="form-label">닉네임</label>
+      <input type="text" name="nickname" class="form-control" required>
+    </div>
+
+    <div class="text-center mt-4">
+      <button type="submit" class="btn btn-purple px-5">가입하기</button>
+    </div>
+  </form>
+
+  <div class="text-center mt-3">
+    <a href="/login" class="text-link">← 이미 계정이 있으신가요?</a>
+  </div>
+</div>
+{% endblock %}

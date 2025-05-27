@@ -1,0 +1,21 @@
+{% extends "base.html" %}
+{% block title %}대시보드{% endblock %}
+
+{% block content %}
+<!-- 왼쪽: 인삿말 -->
+<div class="panel left">
+  <h2>🎉 환영합니다</h2>
+  <p style="font-size: 18px; font-weight: 500;">{{ email }} 님, 오늘도 멋진 하루 보내세요!</p>
+  <img src="https://emojicdn.elk.sh/💌?style=apple" alt="heart" style="width: 80px; margin-top: 30px;">
+</div>
+
+<!-- 오른쪽: 기능 선택 -->
+<div class="panel right">
+  <h2 class="mb-4">📋 메뉴 선택</h2>
+  <div class="d-grid gap-3 w-100" style="max-width: 320px; margin: auto;">
+    <a href="{{ url_for('explore') }}" class="btn btn-purple w-100">💘 내 이상형 찾기</a>
+    <a href="{{ url_for('matches') }}" class="btn btn-purple w-100">💑 매칭된 사람 보기</a>
+    <a href="{{ url_for('logout') }}" class="btn btn-dark w-100">🚪 로그아웃</a>
+  </div>
+</div>
+{% endblock %}
