@@ -115,7 +115,7 @@ def profile():
     return render_template('profile.html', user=user)
 
 
-@app.route('/profile_edit', methods=['GET', 'POST'])
+@app.route('/profile_edit', methods=['GET', 'POST'], endpoint='edit_profile')
 def profile_edit():
     if 'email' not in session:
         return redirect(url_for('home'))
@@ -128,6 +128,7 @@ def profile_edit():
         nickname = request.form['nickname']
         mbti = request.form['mbti']
         age = request.form['age']
+        gender = request.form['gender']
         job = request.form['job']
         location = request.form['location']
         religion = request.form['religion']
@@ -139,11 +140,13 @@ def profile_edit():
         instagram = request.form['instagram']
 
         cursor.execute("""
-            UPDATE profiles SET nickname=%s, mbti=%s, age=%s, job=%s, location=%s,
-            religion=%s, dream=%s, love_style=%s, preference=%s, keywords=%s,
-            phone=%s, instagram=%s WHERE user_email=%s
-        """, (nickname, mbti, age, job, location, religion, dream,
-              love_style, preference, keywords, phone, instagram, email))
+            UPDATE profiles
+            SET nickname=%s, mbti=%s, age=%s, gender=%s, job=%s, location=%s,
+                religion=%s, dream=%s, love_style=%s, preference=%s, keywords=%s,
+                phone=%s, instagram=%s
+            WHERE user_email=%s
+        """, (nickname, mbti, age, gender, job, location, religion,
+              dream, love_style, preference, keywords, phone, instagram, email))
         conn.commit()
         cursor.close()
         conn.close()
@@ -153,7 +156,7 @@ def profile_edit():
     user = cursor.fetchone()
     cursor.close()
     conn.close()
-    return render_template("profile_edit.html", user=user)
+    return render_template("edit_profile.html", user=user)
 
 @app.route('/explore', methods=['GET', 'POST'])
 def explore():
