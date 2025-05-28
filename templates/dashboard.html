@@ -92,18 +92,8 @@
     <img src="https://emojicdn.elk.sh/💌?style=apple" alt="heart" style="width: 80px; margin-top: 30px;">
 
     <!-- 오늘의 매칭 -->
-    <h3>💖 오늘의 매칭</h3>
-    {% if today_matches %}
-      <ul style="list-style:none; padding-left: 0;">
-        {% for match in today_matches %}
-          <li style="margin-bottom: 10px;">
-            {{ match.user1_nickname }}님 ♥ {{ match.user2_nickname }}님
-          </li>
-        {% endfor %}
-      </ul>
-    {% else %}
-      <p style="color: gray;">오늘 매칭된 사용자가 없습니다.</p>
-    {% endif %}
+<h4>오늘의 매칭 수: {{ match_count }}명</h4>
+
   </div>
 
   <!-- 오른쪽 메뉴 -->
