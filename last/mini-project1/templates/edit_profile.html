@@ -1,0 +1,145 @@
+{% extends "base.html" %}
+{% block title %}프로필 수정{% endblock %}
+{% block content %}
+
+<style>
+  body {
+    background: linear-gradient(135deg, #f3e7f3, #d4e0f0);
+    font-family: 'Segoe UI', 'Pretendard', sans-serif;
+  }
+
+  .panel.left {
+    background-color: #e9d8fd;
+    padding: 2rem;
+    border-radius: 15px 0 0 15px;
+    color: #4a148c;
+    text-align: center;
+  }
+
+  .panel.right {
+    background-color: #fffdfc;
+    padding: 2rem 3rem;
+    border-radius: 0 15px 15px 0;
+    box-shadow: 0 0 10px rgba(0,0,0,0.05);
+  }
+
+  .btn-purple {
+    background-color: #ba68c8;
+    color: white;
+  }
+
+  .btn-purple:hover {
+    background-color: #9c27b0;
+    color: white;
+  }
+
+  .form-label {
+    font-weight: 600;
+  }
+
+  textarea {
+    resize: none;
+  }
+</style>
+
+<!-- 왼쪽 패널 -->
+<div class="panel left">
+  <h2>프로필 수정</h2>
+  <p>내 정보를 수정해보세요!</p>
+  <img src="https://emojicdn.elk.sh/🛠️?style=apple" style="width: 80px; margin-top: 30px;">
+</div>
+
+<!-- 오른쪽 패널 -->
+<div class="panel right">
+  <h2 class="mb-4 text-center">내 정보 수정</h2>
+  <form method="POST" class="row g-3">
+
+    <div class="col-md-6">
+      <label class="form-label">닉네임</label>
+      <input type="text" name="nickname" value="{{ user.nickname }}" class="form-control" required>
+    </div>
+
+    <div class="col-md-6">
+      <label class="form-label">MBTI</label>
+      <input type="text" name="mbti" value="{{ user.mbti }}" class="form-control">
+    </div>
+
+    <div class="col-md-6">
+      <label class="form-label">나이</label>
+      <input type="number" name="age" value="{{ user.age }}" class="form-control">
+    </div>
+
+    <div class="col-md-6">
+      <label class="form-label">성별</label>
+      <select name="gender" class="form-select">
+        <option value="남자" {% if user.gender == "남자" %}selected{% endif %}>남자</option>
+        <option value="여자" {% if user.gender == "여자" %}selected{% endif %}>여자</option>
+      </select>
+    </div>
+
+    <div class="col-md-6">
+      <label class="form-label">직업</label>
+      <input type="text" name="job" value="{{ user.job }}" class="form-control">
+    </div>
+
+    <div class="col-md-6">
+      <label class="form-label">사는 곳</label>
+      <input type="text" name="location" value="{{ user.location }}" class="form-control">
+    </div>
+
+    <div class="col-md-6">
+      <label class="form-label">종교</label>
+      <input type="text" name="religion" value="{{ user.religion }}" class="form-control">
+    </div>
+
+    <div class="col-md-6">
+      <label class="form-label">연락처</label>
+      <input type="text" name="phone" value="{{ user.phone }}" class="form-control">
+    </div>
+
+    <div class="col-md-6">
+      <label class="form-label">인스타그램</label>
+      <input type="text" name="instagram" value="{{ user.instagram }}" class="form-control">
+    </div>
+
+    <div class="col-md-6">
+      <label class="form-label">키워드</label>
+      <input type="text" name="keywords" value="{{ user.keywords }}" class="form-control">
+    </div>
+
+    <div class="col-md-12">
+      <label class="form-label">꿈/목표</label>
+      <textarea name="dream" class="form-control" rows="2">{{ user.dream }}</textarea>
+    </div>
+
+    <div class="col-md-12">
+      <label class="form-label">연애관</label>
+      <textarea name="love_style" class="form-control" rows="2">{{ user.love_style }}</textarea>
+    </div>
+
+    <div class="col-md-12">
+      <label class="form-label">취향</label>
+      <textarea name="preference" class="form-control" rows="2">{{ user.preference }}</textarea>
+    </div>
+
+    <div class="col-md-12">
+      <label class="form-label">프로필 이미지 URL</label>
+      <input type="text" name="profile_img_url" value="{{ user.profile_img }}" class="form-control" placeholder="https://example.com/image.jpg">
+    </div>
+
+    <div class="col-md-6">
+      <label class="form-label">공개 설정</label>
+      <select name="is_public" class="form-select">
+        <option value="1" {% if user.is_public %}selected{% endif %}>공개</option>
+        <option value="0" {% if not user.is_public %}selected{% endif %}>비공개</option>
+      </select>
+    </div>
+
+    <div class="text-center mt-4">
+      <button type="submit" class="btn btn-purple px-5">저장하기</button>
+      <a href="{{ url_for('profile') }}" class="btn btn-secondary ms-2">취소</a>
+    </div>
+  </form>
+</div>
+
+{% endblock %}

@@ -1,0 +1,248 @@
+{% extends "base.html" %}
+{% block title %}채팅{% endblock %}
+
+{% block content %}
+<style>
+  body {
+    background: linear-gradient(to right, #f3e7f3, #d4e0f0);
+  }
+
+  #chat-box {
+    height: 350px;
+    overflow-y: auto;
+    background: #ffffff;
+    border-radius: 10px;
+    padding: 1rem;
+    box-shadow: 0 0 10px rgba(0, 0, 0, 0.05);
+  }
+
+  #chat-form {
+    display: flex;
+    gap: 10px;
+  }
+
+  #msg-input {
+    flex-grow: 1;
+    border-radius: 25px;
+    border: 1px solid #ccc;
+    padding: 10px 20px;
+    font-size: 0.95rem;
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.05);
+  }
+
+  #chat-form .btn {
+    border: none;
+    border-radius: 25px;
+    padding: 10px 20px;
+    background-color: #1d72f3;
+    color: white;
+    font-weight: bold;
+    white-space: nowrap;
+  }
+
+  #chat-form .btn:hover {
+    background-color: #155bd5;
+  }
+
+  /* ✅ Toast 스타일 */
+  #toast-container {
+    position: fixed;
+    top: 20px;
+    left: 50%;
+    transform: translateX(-50%);
+    z-index: 1050;
+  }
+
+  .toast-message {
+    background-color: #ffeb3b;
+    color: #000;
+    padding: 10px 20px;
+    border-radius: 8px;
+    margin-top: 10px;
+    box-shadow: 0 0 10px rgba(0,0,0,0.1);
+    font-weight: bold;
+    animation: fadeout 3s forwards;
+  }
+
+  @keyframes fadeout {
+    0% { opacity: 1; }
+    80% { opacity: 1; }
+    100% { opacity: 0; transform: translateY(-10px); }
+  }
+
+  /* ✅ 커스텀 모달 */
+  .modal-overlay {
+    position: fixed;
+    top: 0; left: 0;
+    width: 100%; height: 100%;
+    background-color: rgba(0,0,0,0.5);
+    display: none;
+    justify-content: center;
+    align-items: center;
+    z-index: 2000;
+  }
+
+  .modal-content {
+    max-width: 400px; 
+    width: 90%;
+    background: #fff;
+    padding: 20px 30px;
+    border-radius: 10px;
+    text-align: center;
+    box-shadow: 0 0 15px rgba(0,0,0,0.2);
+  }
+
+  .modal-buttons {
+    margin-top: 20px;
+    display: flex;
+    justify-content: center;
+    gap: 15px;
+  }
+
+  .btn-warning {
+    background-color: #ffc107;
+    border: none;
+    padding: 8px 18px;
+    border-radius: 6px;
+    color: #000;
+    font-weight: bold;
+  }
+
+  .btn-secondary {
+    background-color: #6c757d;
+    border: none;
+    padding: 8px 18px;
+    border-radius: 6px;
+    color: #fff;
+  }
+</style>
+
+<!-- ✅ Toast 영역 -->
+<div id="toast-container"></div>
+
+<!-- ✅ 커스텀 신고 모달 -->
+<div id="report-modal" class="modal-overlay">
+  <div class="modal-content">
+    <p>이 사용자를 신고하시겠습니까?</p>
+    <div class="modal-buttons">
+      <button id="confirm-report" class="btn btn-warning">확인</button>
+      <button id="cancel-report" class="btn btn-secondary">취소</button>
+    </div>
+  </div>
+</div>
+
+<div class="container py-4">
+  <h4 class="mb-4"><strong>{{ user_email }}</strong>님과의 채팅</h4>
+  {% if is_reported %}
+    <div class="alert alert-danger text-center">
+      🚨 이 사용자는 여러 번 신고된 사용자입니다.
+    </div>
+  {% endif %}
+
+  <div id="chat-box" class="bg-white shadow-sm rounded p-3 mb-3">
+    {% for sender, content, time in messages %}
+      <div class="mb-2">
+        <span class="fw-bold">{{ sender }}:</span>
+        <span>{{ content }}</span>
+        <span class="text-muted small">({{ time }})</span>
+      </div>
+    {% endfor %}
+  </div>
+
+  <form id="chat-form" class="mb-4">
+    <input id="msg-input" type="text" name="message" class="form-control" placeholder="메시지를 입력하세요..." required autocomplete="off">
+    <button type="submit" class="btn">전송</button>
+  </form>
+
+  <div class="d-flex gap-2">
+    <form action="{{ url_for('matches') }}" method="GET">
+      <button type="submit" class="btn btn-outline-secondary w-100">채팅방 나가기</button>
+    </form>
+
+    <form action="{{ url_for('unmatch', user_email=user_email) }}" method="POST" onsubmit="return confirm('정말 매칭을 취소하시겠습니까?')">
+      <button type="submit" class="btn btn-outline-danger w-100">❌ 매칭 취소</button>
+    </form>
+
+    <!-- 🚩 신고하기 버튼 -->
+    <form id="report-form" action="{{ url_for('report.report_user', reported_email=user_email) }}" method="POST">
+      <button type="submit" class="btn btn-outline-warning w-100">🚩 신고하기</button>
+    </form>
+  </div>
+</div>
+
+<!-- ✅ Toast 및 신고 모달 처리 -->
+<script>
+  const reportForm = document.getElementById('report-form');
+  const modal = document.getElementById('report-modal');
+  const confirmBtn = document.getElementById('confirm-report');
+  const cancelBtn = document.getElementById('cancel-report');
+
+  reportForm.addEventListener('submit', function(e) {
+    e.preventDefault();
+    modal.style.display = 'flex';
+  });
+
+  cancelBtn.addEventListener('click', function() {
+    modal.style.display = 'none';
+  });
+
+  confirmBtn.addEventListener('click', function() {
+    fetch(reportForm.action, {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/x-www-form-urlencoded'
+      }
+    }).then(response => {
+      if (response.ok) {
+        showToast('🚨 신고했습니다!');
+      }
+    });
+    modal.style.display = 'none';
+  });
+
+  function showToast(message) {
+    const container = document.getElementById('toast-container');
+    const toast = document.createElement('div');
+    toast.className = 'toast-message';
+    toast.textContent = message;
+    container.appendChild(toast);
+    setTimeout(() => {
+      toast.remove();
+    }, 3000);
+  }
+</script>
+
+<!-- ✅ 실시간 채팅 처리 -->
+<script src="https://cdnjs.cloudflare.com/ajax/libs/socket.io/4.5.4/socket.io.min.js" crossorigin="anonymous"></script>
+<script>
+  const socket = io();
+  const myEmail = "{{ my_email }}";
+  const userEmail = "{{ user_email }}";
+  const room = [myEmail, userEmail].sort().join("_");
+
+  socket.emit('join', { my_email: myEmail, user_email: userEmail });
+
+  document.getElementById('chat-form').addEventListener('submit', function(e) {
+    e.preventDefault();
+    const input = document.getElementById('msg-input');
+    const msg = input.value.trim();
+    if (!msg) return;
+    socket.emit('send_message', {
+      my_email: myEmail,
+      user_email: userEmail,
+      message: msg
+    });
+    input.value = '';
+  });
+
+  socket.on('receive_message', function(data) {
+    const box = document.getElementById('chat-box');
+    const msgBlock = document.createElement('div');
+    msgBlock.classList.add('mb-2');
+    msgBlock.innerHTML = `<span class="fw-bold">${data.sender}:</span> ${data.content} <span class="text-muted small">(${data.timestamp})</span>`;
+    box.appendChild(msgBlock);
+    box.scrollTop = box.scrollHeight;
+  });
+</script>
+{% endblock %}
+
