@@ -2,104 +2,192 @@
 {% block title %}프로필 작성{% endblock %}
 
 {% block content %}
-<!-- 왼쪽 패널: 설명 -->
-<div class="panel left">
-  <h2>🌟 프로필 작성</h2>
-  <p>당신을 소개해보세요!<br>취향과 성격, 목표까지</p>
-  <img src="https://emojicdn.elk.sh/📝?style=apple" alt="온보딩" style="width: 80px; margin-top: 30px;">
-</div>
+<style>
+  @import url('https://fonts.googleapis.com/css2?family=Gowun+Dodum&display=swap');
 
-<!-- 오른쪽 패널: 폼 입력 -->
-<div class="panel right">
-  <h2 class="mb-4">나를 표현하는 프로필</h2>
-  <form method="POST" class="row g-3">
-    <div class="col-md-6">
-      <label class="form-label">동물 아이콘</label>
-      <select name="animal" class="form-select">
-        <option value="사자">🦁 사자</option>
-        <option value="원숭이">🐒 원숭이</option>
-        <option value="공룡">🦖 공룡</option>
-        <option value="여우">🦊 여우</option>
-        <option value="토끼">🐰 토끼</option>
-        <option value="강아지">🐶 강아지</option>
-        <option value="고양이">🐱 고양이</option>
-        <option value="다람쥐">🐿️ 다람쥐</option>
-        <option value="사슴">🦌 사슴</option>
-        <option value="곰">🐻 곰</option>
-      </select>
-    </div>
+  body {
+    font-family: 'Gowun Dodum', sans-serif;
+    background: linear-gradient(135deg, #f8e1f4, #e1f1fa);
+    min-height: 100vh;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    margin: 0;
+  }
 
-    <div class="col-md-6">
-      <label class="form-label">성별</label>
-      <select name="gender" class="form-select" required>
-        <option value="남자">남자</option>
-        <option value="여자">여자</option>
-      </select>
-    </div>
+  .panel {
+    flex: 1;
+    padding: 40px;
+  }
 
-    <div class="col-md-6">
-      <label class="form-label">닉네임</label>
-      <input type="text" name="nickname" class="form-control" required>
-    </div>
+  .left {
+    background: #fff4e6;
+    color: #d17b0f;
+    text-align: center;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    border-top-left-radius: 20px;
+    border-bottom-left-radius: 20px;
+  }
 
-    <div class="col-md-6">
-      <label class="form-label">MBTI</label>
-      <input type="text" name="mbti" class="form-control">
-    </div>
+  .right {
+    background: white;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    border-top-right-radius: 20px;
+    border-bottom-right-radius: 20px;
+  }
 
-    <div class="col-md-6">
-      <label class="form-label">나이</label>
-      <input type="number" name="age" class="form-control">
-    </div>
+  .btn-purple {
+    background-color: #a88beb;
+    color: white;
+    border-radius: 30px;
+    padding: 10px;
+    transition: 0.3s ease;
+  }
 
-    <div class="col-md-6">
-      <label class="form-label">직업</label>
-      <input type="text" name="job" class="form-control">
-    </div>
+  .btn-purple:hover {
+    background-color: #845ef7;
+  }
 
-    <div class="col-md-6">
-      <label class="form-label">사는 곳</label>
-      <input type="text" name="location" class="form-control">
-    </div>
+  .text-link {
+    color: #7e57c2;
+    text-decoration: none;
+  }
 
-    <div class="col-md-6">
-      <label class="form-label">종교</label>
-      <input type="text" name="religion" class="form-control">
-    </div>
+  .text-link:hover {
+    text-decoration: underline;
+  }
 
-    <div class="col-md-12">
-      <label class="form-label">꿈/목표</label>
-      <textarea name="dream" class="form-control" rows="2"></textarea>
-    </div>
+  .mbti-grid {
+    display: grid;
+    grid-template-columns: repeat(4, 1fr);
+    gap: 10px;
+    justify-items: center;
+    margin-bottom: 15px;
+  }
 
-    <div class="col-md-12">
-      <label class="form-label">연애관</label>
-      <textarea name="love_style" class="form-control" rows="2"></textarea>
-    </div>
+  .mbti-option {
+    padding: 8px 16px;
+    border: 2px solid #a88beb;
+    border-radius: 20px;
+    background-color: white;
+    color: #a88beb;
+    cursor: pointer;
+    transition: 0.2s;
+    font-weight: bold;
+  }
 
-    <div class="col-md-12">
-      <label class="form-label">취향</label>
-      <textarea name="preference" class="form-control" rows="2"></textarea>
-    </div>
+  .mbti-option.selected {
+    background-color: #a88beb;
+    color: white;
+  }
 
-    <div class="col-md-12">
-      <label class="form-label">나를 표현하는 키워드</label>
-      <input type="text" name="keywords" class="form-control">
-    </div>
+  .profile-container {
+    display: flex;
+    width: 1000px;
+    background: white;
+    border-radius: 20px;
+    box-shadow: 0 0 30px rgba(0,0,0,0.1);
+    overflow: hidden;
+    animation: bounceIn 0.6s ease-out;
+  }
 
-    <div class="col-md-6">
-      <label class="form-label">연락처</label>
-      <input type="text" name="phone" class="form-control" required>
-    </div>
+  @keyframes bounceIn {
+    0%   { opacity: 0; transform: scale(0.9); }
+    50%  { opacity: 0.7; transform: scale(1.05); }
+    100% { opacity: 1; transform: scale(1); }
+  }
+</style>
 
-    <div class="col-md-6">
-      <label class="form-label">인스타그램 ID</label>
-      <input type="text" name="instagram" class="form-control" required>
-    </div>
+<script>
+  function toggleMBTI(group, value) {
+    const buttons = document.querySelectorAll(`.mbti-${group}`);
+    buttons.forEach(btn => btn.classList.remove('selected'));
+    const selectedBtn = document.getElementById(`mbti-${group}-${value}`);
+    selectedBtn.classList.add('selected');
+    document.getElementById(`mbti-input-${group}`).value = value;
+  }
+</script>
 
-    <div class="col-12 text-center mt-3">
-      <input type="submit" value="제출하기" class="btn btn-purple px-5">
-    </div>
-  </form>
+<div class="profile-container">
+  <!-- 왼쪽 설명 패널 -->
+  <div class="panel left">
+    <h2>프로필 작성</h2>
+    <p>나는 어떤 사람인가요?<br>취향과 성격, 목표까지</p>
+    <img src="https://emojicdn.elk.sh/💜?style=apple" alt="온보딩" style="width: 80px; margin-top: 30px;">
+  </div>
+
+  <!-- 오른쪽 폼 패널 -->
+  <div class="panel right">
+    <h2 class="mb-4 text-center">나를 표현하는 프로필</h2>
+    <form method="POST" class="row g-3 px-4">
+      <div class="col-md-6">
+        <label class="form-label">동물 아이콘</label>
+        <select name="animal" class="form-select">
+          <option value="사자">🦁 사자</option>
+          <option value="원숭이">🐒 원숭이</option>
+          <option value="공룡">🦖 공룡</option>
+          <option value="여우">🦊 여우</option>
+          <option value="토끼">🐰 토끼</option>
+          <option value="강아지">🐶 강아지</option>
+          <option value="고양이">🐱 고양이</option>
+          <option value="다람쥐">🐿️ 다람쥐</option>
+          <option value="사슴">🦌 사슴</option>
+          <option value="곰">🐻 곰</option>
+        </select>
+      </div>
+
+      <div class="col-md-6">
+        <label class="form-label">성별</label>
+        <select name="gender" class="form-select" required>
+          <option value="남자">남자</option>
+          <option value="여자">여자</option>
+        </select>
+      </div>
+
+      <div class="col-md-6">
+        <label class="form-label">닉네임</label>
+        <input type="text" name="nickname" class="form-control" required>
+      </div>
+
+      <div class="col-md-12">
+        <label class="form-label">MBTI</label>
+        <div class="mbti-grid">
+          <button type="button" class="mbti-option mbti-ei" id="mbti-ei-E" onclick="toggleMBTI('ei','E')">E</button>
+          <button type="button" class="mbti-option mbti-ns" id="mbti-ns-N" onclick="toggleMBTI('ns','N')">N</button>
+          <button type="button" class="mbti-option mbti-ft" id="mbti-ft-F" onclick="toggleMBTI('ft','F')">F</button>
+          <button type="button" class="mbti-option mbti-pj" id="mbti-pj-P" onclick="toggleMBTI('pj','P')">P</button>
+          <button type="button" class="mbti-option mbti-ei" id="mbti-ei-I" onclick="toggleMBTI('ei','I')">I</button>
+          <button type="button" class="mbti-option mbti-ns" id="mbti-ns-S" onclick="toggleMBTI('ns','S')">S</button>
+          <button type="button" class="mbti-option mbti-ft" id="mbti-ft-T" onclick="toggleMBTI('ft','T')">T</button>
+          <button type="button" class="mbti-option mbti-pj" id="mbti-pj-J" onclick="toggleMBTI('pj','J')">J</button>
+        </div>
+        <input type="hidden" name="mbti_ei" id="mbti-input-ei">
+        <input type="hidden" name="mbti_ns" id="mbti-input-ns">
+        <input type="hidden" name="mbti_ft" id="mbti-input-ft">
+        <input type="hidden" name="mbti_pj" id="mbti-input-pj">
+      </div>
+
+      <div class="col-md-6"><label class="form-label">나이</label><input type="number" name="age" class="form-control"></div>
+      <div class="col-md-6"><label class="form-label">직업</label><input type="text" name="job" class="form-control"></div>
+      <div class="col-md-6"><label class="form-label">사는 곳</label><input type="text" name="location" class="form-control"></div>
+      <div class="col-md-6"><label class="form-label">종교</label><input type="text" name="religion" class="form-control"></div>
+      <div class="col-md-12"><label class="form-label">꿈/목표</label><textarea name="dream" class="form-control" rows="2"></textarea></div>
+      <div class="col-md-12"><label class="form-label">연애관</label><textarea name="love_style" class="form-control" rows="2"></textarea></div>
+      <div class="col-md-12"><label class="form-label">취향</label><textarea name="preference" class="form-control" rows="2"></textarea></div>
+      <div class="col-md-12"><label class="form-label">나를 표현하는 키워드</label><input type="text" name="keywords" class="form-control"></div>
+      <div class="col-md-6"><label class="form-label">연락처</label><input type="text" name="phone" class="form-control" required></div>
+      <div class="col-md-6"><label class="form-label">인스타그램 ID</label><input type="text" name="instagram" class="form-control" required></div>
+
+      <div class="col-12 text-center mt-3">
+        <input type="submit" value="제출하기" class="btn btn-purple px-5">
+      </div>
+    </form>
+  </div>
 </div>
 {% endblock %}
+
+

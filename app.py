@@ -1,5 +1,6 @@
 from flask import Flask, render_template, request, redirect, url_for, session
 from auth import register_user, login_user
+from flask import flash
 from db import get_connection
 from flask_socketio import SocketIO, join_room, emit
 from datetime import datetime
@@ -27,8 +28,10 @@ def login():
         session['email'] = email
         return redirect(url_for('dashboard'))
     else:
-        print("❌ 로그인 실패")
-        return "❌ 로그인 실패!"
+        # flash에 담아두고
+        flash('이메일 또는 비밀번호가 일치하지 않습니다.', 'danger')
+        # 로그인 화면으로 되돌아갑니다.
+    return redirect(url_for('home'))
 
 @app.route('/register', methods=['GET', 'POST'])
 def register():
@@ -61,7 +64,14 @@ def onboarding():
         email = session['email']
         nickname = request.form['nickname']
         animal = request.form['animal']
-        mbti = request.form['mbti']
+
+        # ✅ MBTI 4요소 결합
+        ei = request.form.get('mbti_ei', '')
+        ns = request.form.get('mbti_ns', '')
+        ft = request.form.get('mbti_ft', '')
+        pj = request.form.get('mbti_pj', '')
+        mbti = ei + ns + ft + pj
+
         age = request.form['age']
         job = request.form['job']
         location = request.form['location']
@@ -78,9 +88,14 @@ def onboarding():
         cursor = conn.cursor()
         try:
             cursor.execute("""
-                INSERT INTO profiles (user_email, nickname, animal_icon, mbti, age, job, location, religion, dream, love_style, preference, keywords, gender, phone, instagram)
-                VALUES (%s, %s, %s, %s, %s, %s, %s, %s, %s,%s, %s, %s, %s, %s, %s)
-            """, (email, nickname, animal, mbti, age, job, location, religion, dream, love_style, preference, keywords, gender, phone, instagram))
+                INSERT INTO profiles (
+                    user_email, nickname, animal_icon, mbti, age, job, location, religion,
+                    dream, love_style, preference, keywords, gender, phone, instagram
+                ) VALUES (%s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s)
+            """, (
+                email, nickname, animal, mbti, age, job, location, religion,
+                dream, love_style, preference, keywords, gender, phone, instagram
+            ))
             conn.commit()
         except Exception as e:
             print("❌ 온보딩 저장 실패:", e)
@@ -92,6 +107,7 @@ def onboarding():
         return redirect(url_for('dashboard'))
 
     return render_template('onboarding.html')
+
 
 @app.route('/dashboard')
 def dashboard():
