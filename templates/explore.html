@@ -40,6 +40,11 @@
       <div class="card mb-3 shadow-sm" style="border-radius: 15px;">
         <div class="card-body">
           <h5 class="card-title">{{ p[2] }} <small class="text-muted">({{ p[12] }})</small></h5>
+          {% if p[-1] == 1 %}
+            <span class="text-success">🟢 활동중</span>
+          {% else %}
+            <span class="text-muted">⚫ 휴식중</span>
+          {% endif %}
           <p class="card-text">
             <strong>동물:</strong> {{ p[5] }} / <strong>MBTI:</strong> {{ p[3] }}<br>
             <strong>나이:</strong> {{ p[4] }}세 / <strong>사는 곳:</strong> {{ p[6] }}

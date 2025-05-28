@@ -205,7 +205,12 @@ def explore():
         gender = request.form.get('gender')
         animal = request.form.get('animal')
 
-        query = "SELECT * FROM profiles WHERE user_email != %s"
+        query = """
+            SELECT p.*, u.is_online
+            FROM profiles p
+            JOIN users u ON p.user_email = u.email
+            WHERE p.user_email != %s
+        """
         params = [session['email']]  # 자기 자신은 제외
 
         if gender:
