@@ -1,5 +1,6 @@
 from flask import Flask, render_template, request, redirect, url_for, session
 from auth import register_user, login_user
+from flask import flash
 from db import get_connection
 from flask_socketio import SocketIO, join_room, emit
 from datetime import datetime
@@ -26,7 +27,10 @@ def login():
         session['email'] = email
         return redirect(url_for('dashboard'))
     else:
-        return "❌ 로그인 실패!"
+        # flash에 담아두고
+        flash('이메일 또는 비밀번호가 일치하지 않습니다.', 'danger')
+        # 로그인 화면으로 되돌아갑니다.
+    return redirect(url_for('home'))
 
 @app.route('/register', methods=['GET', 'POST'])
 def register():
