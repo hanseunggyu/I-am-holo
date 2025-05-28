@@ -59,7 +59,14 @@ def onboarding():
         email = session['email']
         nickname = request.form['nickname']
         animal = request.form['animal']
-        mbti = request.form['mbti']
+
+        # ✅ MBTI 4요소 결합
+        ei = request.form.get('mbti_ei', '')
+        ns = request.form.get('mbti_ns', '')
+        ft = request.form.get('mbti_ft', '')
+        pj = request.form.get('mbti_pj', '')
+        mbti = ei + ns + ft + pj
+
         age = request.form['age']
         job = request.form['job']
         location = request.form['location']
@@ -76,9 +83,14 @@ def onboarding():
         cursor = conn.cursor()
         try:
             cursor.execute("""
-                INSERT INTO profiles (user_email, nickname, animal_icon, mbti, age, job, location, religion, dream, love_style, preference, keywords, gender, phone, instagram)
-                VALUES (%s, %s, %s, %s, %s, %s, %s, %s, %s,%s, %s, %s, %s, %s, %s)
-            """, (email, nickname, animal, mbti, age, job, location, religion, dream, love_style, preference, keywords, gender, phone, instagram))
+                INSERT INTO profiles (
+                    user_email, nickname, animal_icon, mbti, age, job, location, religion,
+                    dream, love_style, preference, keywords, gender, phone, instagram
+                ) VALUES (%s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s)
+            """, (
+                email, nickname, animal, mbti, age, job, location, religion,
+                dream, love_style, preference, keywords, gender, phone, instagram
+            ))
             conn.commit()
         except Exception as e:
             print("❌ 온보딩 저장 실패:", e)
@@ -90,6 +102,7 @@ def onboarding():
         return redirect(url_for('dashboard'))
 
     return render_template('onboarding.html')
+
 
 @app.route('/dashboard')
 def dashboard():

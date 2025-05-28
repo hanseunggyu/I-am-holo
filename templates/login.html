@@ -2,23 +2,124 @@
 {% block title %}로그인{% endblock %}
 
 {% block content %}
-<!-- 왼쪽 패널: 설명 -->
-<div class="panel left">
-  <h2>Welcome Back!</h2>
-  <p>다시 만난 당신,<br>반가워요 😊<br><br>로그인하고 소개팅을 시작해보세요!</p>
-  <img src="https://emojicdn.elk.sh/💌?style=apple" alt="love" style="width: 80px; margin-top: 30px;">
-</div>
+<style>
+  @import url('https://fonts.googleapis.com/css2?family=Gowun+Dodum&display=swap');
 
-<!-- 오른쪽 패널: 로그인 폼 -->
-<div class="panel right">
-  <h2>🔐 로그인</h2>
-  <form method="POST" action="/login" class="w-100" style="max-width: 350px; margin: auto;">
-    <input type="text" name="email" placeholder="이메일" class="form-control" required>
-    <input type="password" name="password" placeholder="비밀번호" class="form-control" required>
-    <button type="submit" class="btn btn-purple w-100 mt-3">로그인</button>
-  </form>
-  <div class="text-center mt-3">
-    <a href="/register" class="text-link">👉 아직 회원이 아니신가요?</a>
+  body {
+    font-family: 'Gowun Dodum', sans-serif;
+    background: linear-gradient(135deg, #f8e1f4, #e1f1fa);
+    min-height: 100vh;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    overflow: hidden;
+  }
+
+  .login-container {
+    display: flex;
+    width: 1000px;
+    box-shadow: 0 0 30px rgba(0,0,0,0.1);
+    border-radius: 20px;
+    overflow: hidden;
+    background: white;
+    animation: bounceIn 0.6s ease-out;
+  }
+
+  .panel {
+    flex: 1;
+    padding: 40px;
+  }
+
+  .left {
+    background: #f5f0ff;
+    text-align: center;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    color: #5d3fd3;
+  }
+
+  .right {
+    background: #ffffff;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+  }
+
+  h2 {
+    font-size: 28px;
+    margin-bottom: 15px;
+  }
+
+  p {
+    font-size: 16px;
+    line-height: 1.6;
+  }
+
+  .form-control {
+    margin-top: 10px;
+    border-radius: 30px;
+    padding: 10px 20px;
+    border: 1px solid #ccc;
+    transition: 0.3s;
+  }
+
+  .form-control:focus {
+    border-color: #9f7aea;
+    box-shadow: 0 0 5px #c2a0ff;
+  }
+
+  .btn-purple {
+    background-color: #a88beb;
+    color: white;
+    border-radius: 30px;
+    padding: 10px;
+    transition: 0.3s ease;
+  }
+
+  .btn-purple:hover {
+    background-color: #845ef7;
+  }
+
+  .text-link {
+    color: #7e57c2;
+    text-decoration: none;
+  }
+
+  .text-link:hover {
+    text-decoration: underline;
+  }
+
+  @keyframes bounceIn {
+    0%   { opacity: 0; transform: scale(0.9); }
+    50%  { opacity: 0.7; transform: scale(1.05); }
+    100% { opacity: 1; transform: scale(1); }
+  }
+</style>
+
+<div class="login-container">
+  <!-- 왼쪽 설명 패널 -->
+  <div class="panel left">
+    <h2>설레는 만남을 시작하세요</h2>
+    <p>다시 만난 당신,<br>정말 반가워요 😊<br><br>로그인하고 설레는 인연을 찾아보세요!</p>
+    <img src="https://emojicdn.elk.sh/💜?style=apple" alt="purple-heart" 
+         style="width: 100px; margin-top: 30px; transition: 0.3s;"
+         onmouseover="this.style.transform='scale(1.2)'"
+         onmouseout="this.style.transform='scale(1)'">
+  </div>
+
+  <!-- 오른쪽 로그인 폼 패널 -->
+  <div class="panel right">
+    <h2>로그인</h2>
+    <form method="POST" action="/login" style="width: 100%; max-width: 350px;">
+      <input type="text" name="email" placeholder="이메일" class="form-control" required>
+      <input type="password" name="password" placeholder="비밀번호" class="form-control" required>
+      <button type="submit" class="btn btn-purple w-100 mt-3">로그인</button>
+    </form>
+    <div class="text-center mt-3">
+      <a href="/register" class="text-link">👉 아직 회원이 아니신가요?</a>
+    </div>
   </div>
 </div>
 {% endblock %}

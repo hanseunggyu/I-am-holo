@@ -2,23 +2,112 @@
 {% block title %}대시보드{% endblock %}
 
 {% block content %}
-<!-- 왼쪽: 인삿말 -->
-<div class="panel left">
-  <h2>🎉 환영합니다</h2>
-  <p style="font-size: 18px; font-weight: 500;">{{ email }} 님, 오늘도 멋진 하루 보내세요!</p>
-  <img src="https://emojicdn.elk.sh/💌?style=apple" alt="heart" style="width: 80px; margin-top: 30px;">
-</div>
+<style>
+  @import url('https://fonts.googleapis.com/css2?family=Gowun+Dodum&display=swap');
 
-<!-- 오른쪽: 기능 선택 -->
-<div class="panel right">
-  <h2 class="mb-4">📋 메뉴 선택</h2>
-  <div class="d-grid gap-3 w-100" style="max-width: 320px; margin: auto;">
-    <a href="{{ url_for('explore') }}" class="btn btn-purple w-100">💘 내 이상형 찾기</a>
-    <a href="{{ url_for('liked_users') }}" class="btn btn-purple w-100">❤️ 내가 좋아요한 사람</a>
-    <a href="{{ url_for('matches') }}" class="btn btn-purple w-100">💑 매칭된 사람 보기</a>
-    <a href="{{ url_for('chatlist') }}" class="btn btn-purple w-100"> ✉ 채팅 목록 </a>
-    <a href="{{ url_for('profile') }}" class="btn btn-purple w-100">👤 내 프로필</a>
-    <a href="{{ url_for('logout') }}" class="btn btn-dark w-100">🚪 로그아웃</a>
+  body {
+    background: linear-gradient(135deg, #f8e1f4, #e1f1fa);
+    font-family: 'Gowun Dodum', sans-serif;
+    min-height: 100vh;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    margin: 0;
+  }
+
+  .dashboard-container {
+    display: flex;
+    width: 1000px;
+    background: white;
+    border-radius: 20px;
+    box-shadow: 0 0 30px rgba(0,0,0,0.1);
+    overflow: hidden;
+    animation: bounceIn 0.6s ease-out;
+  }
+
+  .panel {
+    flex: 1;
+    padding: 40px;
+  }
+
+  .left {
+    background: #f5f0ff;
+    color: #5d3fd3;
+    text-align: center;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+  }
+
+  .right {
+    background: white;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+  }
+
+  .btn-purple {
+    background-color: #a88beb;
+    color: white;
+    border-radius: 30px;
+    padding: 10px;
+    transition: 0.3s ease;
+  }
+
+  .btn-purple:hover {
+    background-color: #845ef7;
+  }
+
+  .btn-dark {
+    border-radius: 30px;
+    padding: 10px;
+  }
+
+  /* 애니메이션 */
+  @keyframes bounceIn {
+    0%   { opacity: 0; transform: scale(0.9); }
+    50%  { opacity: 0.7; transform: scale(1.05); }
+    100% { opacity: 1; transform: scale(1); }
+  }
+
+  @keyframes shake {
+    0% { transform: rotate(0deg); }
+    25% { transform: rotate(7deg); }
+    50% { transform: rotate(-7deg); }
+    75% { transform: rotate(7deg); }
+    100% { transform: rotate(0deg); }
+  }
+
+  .emoji-hover:hover {
+    animation: shake 0.5s ease-in-out;
+  }
+</style>
+
+<div class="dashboard-container">
+  <!-- 왼쪽: 인삿말 -->
+  <div class="panel left">
+    <h2>환영합니다</h2>
+    <p style="font-size: 18px; font-weight: 500;">{{ email }}님, 오늘 새로운 인연을 만나보세요!</p>
+    <img src="https://emojicdn.elk.sh/💜?style=apple"
+         alt="purple-heart"
+         class="emoji-hover"
+         style="width: 80px; margin-top: 30px;">
+  </div>
+
+  <!-- 오른쪽: 기능 선택 -->
+  <div class="panel right">
+    <h2 class="mb-4">메뉴 선택</h2>
+    <div class="d-grid gap-3 w-100" style="max-width: 320px;">
+      <a href="{{ url_for('explore') }}" class="btn btn-purple w-100">💘 내 이상형 찾기</a>
+      <a href="{{ url_for('liked_users') }}" class="btn btn-purple w-100">❤️ 내가 좋아요한 사람</a>
+      <a href="{{ url_for('matches') }}" class="btn btn-purple w-100">💑 매칭된 사람 보기</a>
+      <a href="{{ url_for('chatlist') }}" class="btn btn-purple w-100">✉ 채팅 목록</a>
+      <a href="{{ url_for('profile') }}" class="btn btn-purple w-100">👤 내 프로필</a>
+      <a href="{{ url_for('logout') }}" class="btn btn-dark w-100">🚪 로그아웃</a>
+    </div>
   </div>
 </div>
 {% endblock %}
+
+
