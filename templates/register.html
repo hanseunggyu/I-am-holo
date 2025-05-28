@@ -114,10 +114,11 @@
   <!-- 오른쪽 패널 -->
   <div class="panel right">
     <h2 class="mb-4">회원가입</h2>
-    <form method="POST" class="mx-auto" style="max-width: 350px;">
+    <form method="POST" class="mx-auto" style="max-width: 350px;" id="register-form">
       <div class="mb-3">
         <label class="form-label">이메일</label>
-        <input type="text" name="email" class="form-control" required>
+        <input type="text" name="email" id="email" class="form-control" required>
+        <div id="email-result" style="font-size: 14px; color: red; margin-top: 5px;"></div>
       </div>
 
       <div class="mb-3">
@@ -125,17 +126,50 @@
         <input type="password" name="password" class="form-control" required>
       </div>
 
-  
-
       <div class="text-center mt-4">
-        <button type="submit" class="btn btn-purple px-5">가입하기</button>
+        <button type="submit" class="btn btn-purple px-5" id="submit-btn">가입하기</button>
       </div>
     </form>
 
+    <!-- ✅ 여기만 남김 -->
     <div class="text-center mt-3">
       <a href="{{ url_for('home') }}" class="text-link">← 이미 계정이 있으신가요?</a>
     </div>
   </div>
 </div>
-{% endblock %}
 
+<script>
+document.getElementById("email").addEventListener("keyup", function () {
+  const email = this.value.trim();
+  const result = document.getElementById("email-result");
+
+  if (email.length === 0) {
+    result.textContent = "";
+    return;
+  }
+
+  const regex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+  if (!regex.test(email)) {
+    result.textContent = "📧 올바른 이메일 형식이 아닙니다.";
+    result.style.color = "red";
+    return;
+  }
+
+  fetch(`/check_email?email=${encodeURIComponent(email)}`)
+    .then(response => response.json())
+    .then(data => {
+      if (data.exists) {
+        result.textContent = "❌ 이미 가입된 이메일입니다.";
+        result.style.color = "red";
+      } else {
+        result.textContent = "✅ 사용 가능한 이메일입니다.";
+        result.style.color = "green";
+      }
+    })
+    .catch(err => {
+      console.error("이메일 확인 중 오류:", err);
+      result.textContent = "";
+    });
+});
+</script>
+{% endblock %}

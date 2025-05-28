@@ -215,11 +215,12 @@ document.getElementById("nickname").addEventListener("keyup", function () {
     })
     .catch(err => {
       console.error("닉네임 확인 중 오류:", err);
-      result.textContent = "⚠️ 오류 발생";
+      result.textContent = "⚠️ 서버 오류가 발생했습니다. 잠시 후 다시 시도해 주세요.";
       result.style.color = "gray";
     });
 });
 </script>
+
 
 {% endblock %}
 

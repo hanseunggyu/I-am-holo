@@ -6,7 +6,7 @@ from flask_socketio import SocketIO, join_room, emit
 from datetime import datetime
 from user import user_bp
 from report import report_bp
-from flask import request, jsonify
+from flask import request, jsonify 
 
 
 app = Flask(__name__)
@@ -42,12 +42,47 @@ def register():
     if request.method == 'POST':
         email = request.form['email']
         password = request.form['password']
+
+        # 이메일 형식 확인 (정규표현식 사용)
+        import re
+        if not re.match(r'^[^@]+@[^@]+\.[^@]+$', email):
+            flash("❌ 올바르지 않은 이메일 형식입니다.", 'danger')
+            return redirect(url_for('register'))
+
+        # 이메일 중복 확인
+        # conn = get_connection()
+        # cursor = conn.cursor()
+        # cursor.execute("SELECT id FROM users WHERE email = %s", (email,))
+        # if cursor.fetchone():
+        #     cursor.close()
+        #     conn.close()
+        #     flash("❌ 이미 가입된 이메일입니다.", 'danger')
+        #     return redirect(url_for('register'))
+        # cursor.close()
+        # conn.close()
+
+        # 실제 회원 등록
         if register_user(email, password):
             session['email'] = email
-            return redirect(url_for('onboarding'))  # ✅ 수정됨!
+            return redirect(url_for('onboarding'))
         else:
-            return "❌ 회원가입 실패 (이메일 중복?)"
+            flash("❌ 회원가입 중 알 수 없는 오류가 발생했습니다.", 'danger')
+            return redirect(url_for('register'))
+
     return render_template("register.html")
+
+
+@app.route('/check_email')
+def check_email():
+    email = request.args.get('email')
+    conn = get_connection()
+    cursor = conn.cursor()
+    cursor.execute("SELECT id FROM users WHERE email = %s", (email,))
+    exists = cursor.fetchone() is not None
+    cursor.close()
+    conn.close()
+    return jsonify({'exists': exists})
+
 
 @app.route('/onboarding', methods=['GET', 'POST'])
 def onboarding():
