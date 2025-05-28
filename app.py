@@ -4,12 +4,14 @@ from db import get_connection
 from flask_socketio import SocketIO, join_room, emit
 from datetime import datetime
 from user import user_bp
+from report import report_bp
 
 app = Flask(__name__)
 app.secret_key = "b'\xd8\x03\xfaW\xca\x01\x13\xf3..."  # 세션 키
 
 #blueprint 
 app.register_blueprint(user_bp)
+app.register_blueprint(report_bp)
 
 # SocketIO 초기화
 socketio = SocketIO(app, cors_allowed_origins="*")
@@ -315,11 +317,15 @@ def chat(user_email):
     cursor.close()
     conn.close()
 
+    from report import is_reported_many_times
+    is_reported = is_reported_many_times(user_email)
+
     return render_template(
         'chat.html',
         messages=messages,
         my_email=my_email,
-        user_email=user_email
+        user_email=user_email,
+        is_reported=is_reported
     )
 
 
