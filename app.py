@@ -142,15 +142,22 @@ def profile_edit():
         keywords = request.form['keywords']
         phone = request.form['phone']
         instagram = request.form['instagram']
+        profile_img_url = request.form.get('profile_img_url')
+
+        # 🔒 None 처리: 빈 값이면 기존 값 유지
+        if not profile_img_url:
+            cursor.execute("SELECT profile_img FROM profiles WHERE user_email = %s", (email,))
+            existing = cursor.fetchone()
+            profile_img_url = existing['profile_img'] if existing else None
 
         cursor.execute("""
             UPDATE profiles
             SET nickname=%s, mbti=%s, age=%s, gender=%s, job=%s, location=%s,
                 religion=%s, dream=%s, love_style=%s, preference=%s, keywords=%s,
-                phone=%s, instagram=%s
+                phone=%s, instagram=%s, profile_img=%s
             WHERE user_email=%s
         """, (nickname, mbti, age, gender, job, location, religion,
-              dream, love_style, preference, keywords, phone, instagram, email))
+              dream, love_style, preference, keywords, phone, instagram, profile_img_url, email))
         conn.commit()
         cursor.close()
         conn.close()
@@ -161,6 +168,7 @@ def profile_edit():
     cursor.close()
     conn.close()
     return render_template("edit_profile.html", user=user)
+
 
 @app.route('/liked')
 def liked_users():
