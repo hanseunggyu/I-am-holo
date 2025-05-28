@@ -177,8 +177,8 @@ def profile():
     return render_template('profile.html', user=user)
 
 
-@app.route('/profile_edit', methods=['GET', 'POST'], endpoint='edit_profile')
-def profile_edit():
+@app.route('/profile_edit', methods=['GET', 'POST'])
+def edit_profile():
     if 'email' not in session:
         return redirect(url_for('home'))
 
@@ -200,32 +200,33 @@ def profile_edit():
         keywords = request.form['keywords']
         phone = request.form['phone']
         instagram = request.form['instagram']
-        profile_img_url = request.form.get('profile_img_url')
+        profile_img = request.form.get('profile_img_url') or None
 
-        # 🔒 None 처리: 빈 값이면 기존 값 유지
-        if not profile_img_url:
-            cursor.execute("SELECT profile_img FROM profiles WHERE user_email = %s", (email,))
-            existing = cursor.fetchone()
-            profile_img_url = existing['profile_img'] if existing else None
+        # ✅ 공개/비공개 설정 수집
+        is_public = request.form.get('is_public') == '1'  # 문자열 '1' → True
 
+        # ✅ 업데이트 쿼리 실행
         cursor.execute("""
             UPDATE profiles
             SET nickname=%s, mbti=%s, age=%s, gender=%s, job=%s, location=%s,
                 religion=%s, dream=%s, love_style=%s, preference=%s, keywords=%s,
-                phone=%s, instagram=%s, profile_img=%s
+                phone=%s, instagram=%s, profile_img=%s, is_public=%s
             WHERE user_email=%s
         """, (nickname, mbti, age, gender, job, location, religion,
-              dream, love_style, preference, keywords, phone, instagram, profile_img_url, email))
+              dream, love_style, preference, keywords, phone, instagram, profile_img, is_public, email))
+
         conn.commit()
         cursor.close()
         conn.close()
         return redirect(url_for('profile'))
 
+    # GET 요청 시: 프로필 정보 조회
     cursor.execute("SELECT * FROM profiles WHERE user_email = %s", (email,))
     user = cursor.fetchone()
     cursor.close()
     conn.close()
     return render_template("edit_profile.html", user=user)
+
 
 
 @app.route('/liked')
@@ -272,11 +273,12 @@ def explore():
         animal = request.form.get('animal')
 
         query = """
-            SELECT p.*, u.is_online
-            FROM profiles p
-            JOIN users u ON p.user_email = u.email
-            WHERE p.user_email != %s
+        SELECT p.*, u.is_online
+        FROM profiles p
+        JOIN users u ON p.user_email = u.email
+        WHERE p.user_email != %s AND p.is_public = TRUE
         """
+
         params = [session['email']]  # 자기 자신은 제외
 
         if gender:

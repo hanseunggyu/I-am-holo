@@ -20,7 +20,21 @@
     <a href="{{ url_for('edit_profile') }}" class="btn btn-outline-secondary d-flex align-items-center" style="font-size: 14px; padding: 6px 12px;">
       ✏️ <span class="ms-1">수정</span>
     </a>
+    <p>
+      {% if user.is_public %}<span class="text-success"></span>
+      {% else %}<span class="text-muted"></span>{% endif %}
+    </p>
   </div>
+
+  <!-- 공개 여부 -->
+  <p>
+    🔒 공개 설정: 
+    {% if user.is_public %}
+      <span class="text-success">🟢 공개</span>
+    {% else %}
+      <span class="text-muted">⚫ 비공개</span>
+    {% endif %}
+  </p>
 
   <!-- 프로필 이미지 -->
   {% if user.profile_img %}
