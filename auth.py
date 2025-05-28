@@ -38,7 +38,7 @@ def login_user(email, password):
     cursor.execute("SELECT password FROM users WHERE email = %s", (email,))
     result = cursor.fetchone()
 
-    if result and check_password_hash(result[0], password):
+    if result and result[0] == password:
         cursor.execute("UPDATE users SET is_online = 1 WHERE email = %s", (email,))
         conn.commit()
         cursor.close()
@@ -127,11 +127,13 @@ def reset_password(token):
 
         # 암호화 제거
         cursor.execute("""
-            UPDATE users 
-            SET password=%s, reset_token=NULL, reset_expire=NULL 
-            WHERE email=%s
+        UPDATE users 
+        SET password = %s, reset_token = NULL, reset_expire = NULL 
+        WHERE email = %s
         """, (new_pw, user['email']))
+        conn.commit()
 
+        # 비밀번호 변경 성공
         flash("✅ 비밀번호가 변경되었습니다. 로그인해 주세요.", 'success')
         cursor.close()
         conn.close()
