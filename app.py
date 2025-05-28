@@ -5,12 +5,14 @@ from db import get_connection
 from flask_socketio import SocketIO, join_room, emit
 from datetime import datetime
 from user import user_bp
+from report import report_bp
 
 app = Flask(__name__)
 app.secret_key = "b'\xd8\x03\xfaW\xca\x01\x13\xf3..."  # 세션 키
 
 #blueprint 
 app.register_blueprint(user_bp)
+app.register_blueprint(report_bp)
 
 # SocketIO 초기화
 socketio = SocketIO(app, cors_allowed_origins="*")
@@ -24,6 +26,7 @@ def login():
     email = request.form['email']
     password = request.form['password']
     if login_user(email, password):
+        print("✅ 로그인 성공:", email)
         session['email'] = email
         return redirect(url_for('dashboard'))
     else:
@@ -112,13 +115,50 @@ def onboarding():
 def dashboard():
     if 'email' not in session:
         return redirect(url_for('home'))
+    
+    my_email = session['email']
 
-    return render_template('dashboard.html', email=session['email'])
+        # DB 연결
+    conn = get_connection()
+    cursor = conn.cursor(dictionary=True)
+
+    # 오늘의 매칭 목록 조회
+    cursor.execute("""
+        SELECT DISTINCT
+            p1.nickname AS user1_nickname,
+            p2.nickname AS user2_nickname
+        FROM likes l1
+        JOIN likes l2 ON l1.to_user = l2.from_user AND l1.from_user = l2.to_user
+        JOIN profiles p1 ON p1.user_email = l1.from_user
+        JOIN profiles p2 ON p2.user_email = l1.to_user
+        WHERE DATE(l1.created_at) = CURDATE()
+          AND DATE(l2.created_at) = CURDATE()
+          AND l1.from_user < l1.to_user
+    """)
+    today_matches = cursor.fetchall()
+
+    # 매칭 수 계산
+    match_count = len(today_matches)
+
+    cursor.close()
+    conn.close()
+
+    return render_template('dashboard.html', email=my_email, today_matches=today_matches, match_count=match_count)
+
 
 @app.route('/logout')
 def logout():
+    email = session.get('email')
+    if email:
+        conn = get_connection()
+        cursor = conn.cursor()
+        cursor.execute("UPDATE users SET is_online = 0 WHERE email = %s", (email,))
+        conn.commit()
+        cursor.close()
+        conn.close()
     session.clear()
     return redirect(url_for('home'))
+
 
 @app.route('/profile')
 def profile():
@@ -136,8 +176,8 @@ def profile():
     return render_template('profile.html', user=user)
 
 
-@app.route('/profile_edit', methods=['GET', 'POST'], endpoint='edit_profile')
-def profile_edit():
+@app.route('/profile_edit', methods=['GET', 'POST'])
+def edit_profile():
     if 'email' not in session:
         return redirect(url_for('home'))
 
@@ -159,25 +199,34 @@ def profile_edit():
         keywords = request.form['keywords']
         phone = request.form['phone']
         instagram = request.form['instagram']
+        profile_img = request.form.get('profile_img_url') or None
 
+        # ✅ 공개/비공개 설정 수집
+        is_public = request.form.get('is_public') == '1'  # 문자열 '1' → True
+
+        # ✅ 업데이트 쿼리 실행
         cursor.execute("""
             UPDATE profiles
             SET nickname=%s, mbti=%s, age=%s, gender=%s, job=%s, location=%s,
                 religion=%s, dream=%s, love_style=%s, preference=%s, keywords=%s,
-                phone=%s, instagram=%s
+                phone=%s, instagram=%s, profile_img=%s, is_public=%s
             WHERE user_email=%s
         """, (nickname, mbti, age, gender, job, location, religion,
-              dream, love_style, preference, keywords, phone, instagram, email))
+              dream, love_style, preference, keywords, phone, instagram, profile_img, is_public, email))
+
         conn.commit()
         cursor.close()
         conn.close()
         return redirect(url_for('profile'))
 
+    # GET 요청 시: 프로필 정보 조회
     cursor.execute("SELECT * FROM profiles WHERE user_email = %s", (email,))
     user = cursor.fetchone()
     cursor.close()
     conn.close()
     return render_template("edit_profile.html", user=user)
+
+
 
 @app.route('/liked')
 def liked_users():
@@ -222,7 +271,13 @@ def explore():
         gender = request.form.get('gender')
         animal = request.form.get('animal')
 
-        query = "SELECT * FROM profiles WHERE user_email != %s"
+        query = """
+        SELECT p.*, u.is_online
+        FROM profiles p
+        JOIN users u ON p.user_email = u.email
+        WHERE p.user_email != %s AND p.is_public = TRUE
+        """
+
         params = [session['email']]  # 자기 자신은 제외
 
         if gender:
@@ -332,11 +387,15 @@ def chat(user_email):
     cursor.close()
     conn.close()
 
+    from report import is_reported_many_times
+    is_reported = is_reported_many_times(user_email)
+
     return render_template(
         'chat.html',
         messages=messages,
         my_email=my_email,
-        user_email=user_email
+        user_email=user_email,
+        is_reported=is_reported
     )
 
 

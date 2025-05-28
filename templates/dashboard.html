@@ -2,6 +2,7 @@
 {% block title %}대시보드{% endblock %}
 
 {% block content %}
+
 <style>
   @import url('https://fonts.googleapis.com/css2?family=Gowun+Dodum&display=swap');
 
@@ -64,7 +65,6 @@
     padding: 10px;
   }
 
-  /* 애니메이션 */
   @keyframes bounceIn {
     0%   { opacity: 0; transform: scale(0.9); }
     50%  { opacity: 0.7; transform: scale(1.05); }
@@ -85,17 +85,18 @@
 </style>
 
 <div class="dashboard-container">
-  <!-- 왼쪽: 인삿말 -->
+  <!-- 왼쪽 인삿말 -->
   <div class="panel left">
-    <h2>환영합니다</h2>
-    <p style="font-size: 18px; font-weight: 500;">{{ email }}님, 오늘 새로운 인연을 만나보세요!</p>
-    <img src="https://emojicdn.elk.sh/💜?style=apple"
-         alt="purple-heart"
-         class="emoji-hover"
-         style="width: 80px; margin-top: 30px;">
+    <h2>🎉 환영합니다</h2>
+    <p style="font-size: 18px; font-weight: 500;">{{ email }} 님, 오늘도 멋진 하루 보내세요!</p>
+    <img src="https://emojicdn.elk.sh/💌?style=apple" alt="heart" style="width: 80px; margin-top: 30px;">
+
+    <!-- 오늘의 매칭 -->
+<h4>오늘의 매칭 수: {{ match_count }}명</h4>
+
   </div>
 
-  <!-- 오른쪽: 기능 선택 -->
+  <!-- 오른쪽 메뉴 -->
   <div class="panel right">
     <h2 class="mb-4">메뉴 선택</h2>
     <div class="d-grid gap-3 w-100" style="max-width: 320px;">
@@ -108,6 +109,5 @@
     </div>
   </div>
 </div>
+
 {% endblock %}
-
-
