@@ -1,5 +1,5 @@
 from flask import Flask, render_template, request, redirect, url_for, session
-from auth import register_user, login_user
+from auth import register_user, login_user, auth_bp
 from flask import flash
 from db import get_connection
 from flask_socketio import SocketIO, join_room, emit
@@ -15,6 +15,7 @@ app.secret_key = "b'\xd8\x03\xfaW\xca\x01\x13\xf3..."  # 세션 키
 #blueprint 
 app.register_blueprint(user_bp)
 app.register_blueprint(report_bp)
+app.register_blueprint(auth_bp)
 
 # SocketIO 초기화
 socketio = SocketIO(app, cors_allowed_origins="*")
