@@ -80,6 +80,12 @@
       <textarea name="preference" class="form-control">{{ user.preference }}</textarea>
     </div>
 
+    <!-- ✅ 프로필 이미지 업로드 -->
+    <div class="col-md-12">
+      <label class="form-label">프로필 이미지 URL</label>
+      <input type="text" name="profile_img_url" value="{{ user.profile_img }}" class="form-control" placeholder="https://example.com/image.jpg">
+    </div>
+
     <div class="text-center mt-3">
       <button type="submit" class="btn btn-purple px-5">저장하기</button>
       <a href="{{ url_for('profile') }}" class="btn btn-secondary ms-2">취소</a>
