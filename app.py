@@ -6,7 +6,6 @@ from flask_socketio import SocketIO, join_room, emit
 from datetime import datetime
 from user import user_bp
 from report import report_bp
-from matches_today import matches_today_bp
 
 app = Flask(__name__)
 app.secret_key = "b'\xd8\x03\xfaW\xca\x01\x13\xf3..."  # 세션 키
@@ -14,7 +13,6 @@ app.secret_key = "b'\xd8\x03\xfaW\xca\x01\x13\xf3..."  # 세션 키
 #blueprint 
 app.register_blueprint(user_bp)
 app.register_blueprint(report_bp)
-app.register_blueprint(matches_today_bp)
 
 # SocketIO 초기화
 socketio = SocketIO(app, cors_allowed_origins="*")
@@ -124,6 +122,7 @@ def dashboard():
     conn = get_connection()
     cursor = conn.cursor(dictionary=True)
 
+    # 오늘의 매칭 목록 조회
     cursor.execute("""
         SELECT DISTINCT
             p1.nickname AS user1_nickname,
@@ -134,17 +133,17 @@ def dashboard():
         JOIN profiles p2 ON p2.user_email = l1.to_user
         WHERE DATE(l1.created_at) = CURDATE()
           AND DATE(l2.created_at) = CURDATE()
-          AND l1.from_user < l1.to_user  -- 중복 제거용: 이메일 알파벳 순서 비교
+          AND l1.from_user < l1.to_user
     """)
-
-
-
     today_matches = cursor.fetchall()
+
+    # 매칭 수 계산
+    match_count = len(today_matches)
 
     cursor.close()
     conn.close()
 
-    return render_template('dashboard.html', email=my_email, today_matches=today_matches)   
+    return render_template('dashboard.html', email=my_email, today_matches=today_matches, match_count=match_count)
 
 
 @app.route('/logout')
