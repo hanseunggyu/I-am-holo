@@ -100,8 +100,17 @@ def dashboard():
 
 @app.route('/logout')
 def logout():
+    email = session.get('email')
+    if email:
+        conn = get_connection()
+        cursor = conn.cursor()
+        cursor.execute("UPDATE users SET is_online = 0 WHERE email = %s", (email,))
+        conn.commit()
+        cursor.close()
+        conn.close()
     session.clear()
     return redirect(url_for('home'))
+
 
 @app.route('/profile')
 def profile():
