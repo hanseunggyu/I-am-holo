@@ -5,6 +5,7 @@ from flask_socketio import SocketIO, join_room, emit
 from datetime import datetime
 from user import user_bp
 from report import report_bp
+from matches_today import matches_today_bp
 
 app = Flask(__name__)
 app.secret_key = "b'\xd8\x03\xfaW\xca\x01\x13\xf3..."  # 세션 키
@@ -12,6 +13,7 @@ app.secret_key = "b'\xd8\x03\xfaW\xca\x01\x13\xf3..."  # 세션 키
 #blueprint 
 app.register_blueprint(user_bp)
 app.register_blueprint(report_bp)
+app.register_blueprint(matches_today_bp)
 
 # SocketIO 초기화
 socketio = SocketIO(app, cors_allowed_origins="*")
@@ -97,8 +99,35 @@ def onboarding():
 def dashboard():
     if 'email' not in session:
         return redirect(url_for('home'))
+    
+    my_email = session['email']
 
-    return render_template('dashboard.html', email=session['email'])
+        # DB 연결
+    conn = get_connection()
+    cursor = conn.cursor(dictionary=True)
+
+    cursor.execute("""
+        SELECT DISTINCT
+            p1.nickname AS user1_nickname,
+            p2.nickname AS user2_nickname
+        FROM likes l1
+        JOIN likes l2 ON l1.to_user = l2.from_user AND l1.from_user = l2.to_user
+        JOIN profiles p1 ON p1.user_email = l1.from_user
+        JOIN profiles p2 ON p2.user_email = l1.to_user
+        WHERE DATE(l1.created_at) = CURDATE()
+          AND DATE(l2.created_at) = CURDATE()
+          AND l1.from_user < l1.to_user  -- 중복 제거용: 이메일 알파벳 순서 비교
+    """)
+
+
+
+    today_matches = cursor.fetchall()
+
+    cursor.close()
+    conn.close()
+
+    return render_template('dashboard.html', email=my_email, today_matches=today_matches)   
+
 
 @app.route('/logout')
 def logout():
