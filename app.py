@@ -23,9 +23,11 @@ def login():
     email = request.form['email']
     password = request.form['password']
     if login_user(email, password):
+        print("✅ 로그인 성공:", email)
         session['email'] = email
         return redirect(url_for('dashboard'))
     else:
+        print("❌ 로그인 실패")
         return "❌ 로그인 실패!"
 
 @app.route('/register', methods=['GET', 'POST'])

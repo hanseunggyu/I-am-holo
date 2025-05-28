@@ -20,13 +20,15 @@ def register_user(email, password):
 def login_user(email, password):
     conn = get_connection()
     cursor = conn.cursor()
+    
     cursor.execute("SELECT password FROM users WHERE email = %s", (email,))
     result = cursor.fetchone()
 
     if result and password == result[0]:
-        # 로그인 성공 시 활동중으로 표시
+        # 로그인 성공 → 활동중으로 표시
         cursor.execute("UPDATE users SET is_online = 1 WHERE email = %s", (email,))
         conn.commit()
+
         cursor.close()
         conn.close()
         return True
@@ -34,3 +36,4 @@ def login_user(email, password):
     cursor.close()
     conn.close()
     return False
+
