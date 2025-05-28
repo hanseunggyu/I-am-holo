@@ -150,7 +150,10 @@
 
       <div class="col-md-6">
         <label class="form-label">닉네임</label>
-        <input type="text" name="nickname" class="form-control" required>
+        <div style="display: flex; align-items: center; gap: 10px;">
+          <input type="text" id="nickname" name="nickname" class="form-control" style="width: 250px;" required>
+          <span id="nickname-result" style="font-size: 14px; white-space: nowrap;"></span>
+        </div>
       </div>
 
       <div class="col-md-12">
@@ -188,6 +191,35 @@
     </form>
   </div>
 </div>
-{% endblock %}
 
+<script>
+document.getElementById("nickname").addEventListener("keyup", function () {
+  const nickname = this.value;
+  const result = document.getElementById("nickname-result");
+
+  if (nickname.length < 2) {
+    result.textContent = "";
+    return;
+  }
+
+  fetch(`/check_nickname?nickname=${encodeURIComponent(nickname)}`)
+    .then(response => response.json())
+    .then(data => {
+      if (data.exists) {
+        result.textContent = "❌ 이미 사용 중인 닉네임입니다.";
+        result.style.color = "red";
+      } else {
+        result.textContent = "✅ 사용 가능한 닉네임입니다.";
+        result.style.color = "green";
+      }
+    })
+    .catch(err => {
+      console.error("닉네임 확인 중 오류:", err);
+      result.textContent = "⚠️ 오류 발생";
+      result.style.color = "gray";
+    });
+});
+</script>
+
+{% endblock %}
 

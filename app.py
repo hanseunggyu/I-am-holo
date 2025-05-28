@@ -6,6 +6,8 @@ from flask_socketio import SocketIO, join_room, emit
 from datetime import datetime
 from user import user_bp
 from report import report_bp
+from flask import request, jsonify
+
 
 app = Flask(__name__)
 app.secret_key = "b'\xd8\x03\xfaW\xca\x01\x13\xf3..."  # 세션 키
@@ -52,18 +54,9 @@ def onboarding():
     if 'email' not in session:
         return redirect(url_for('home'))
 
-    conn = get_connection()
-    cursor = conn.cursor()
-    cursor.execute("SELECT id FROM profiles WHERE user_email = %s", (session['email'],))
-    existing = cursor.fetchone()
-    cursor.close()
-    conn.close()
-
-    if existing:
-        return redirect(url_for('dashboard'))
+    email = session['email']
 
     if request.method == 'POST':
-        email = session['email']
         nickname = request.form['nickname']
         animal = request.form['animal']
 
@@ -88,6 +81,16 @@ def onboarding():
 
         conn = get_connection()
         cursor = conn.cursor()
+
+        # ✅ 기존 프로필 존재 확인
+        cursor.execute("SELECT id FROM profiles WHERE user_email = %s", (email,))
+        existing = cursor.fetchone()
+        if existing:
+            cursor.close()
+            conn.close()
+            return redirect(url_for('dashboard'))
+
+        # ✅ 정상 등록
         try:
             cursor.execute("""
                 INSERT INTO profiles (
@@ -109,6 +112,17 @@ def onboarding():
         return redirect(url_for('dashboard'))
 
     return render_template('onboarding.html')
+
+@app.route('/check_nickname')
+def check_nickname():
+    nickname = request.args.get('nickname')
+    conn = get_connection()
+    cursor = conn.cursor()
+    cursor.execute("SELECT id FROM profiles WHERE nickname = %s", (nickname,))
+    exists = cursor.fetchone() is not None
+    cursor.close()
+    conn.close()
+    return jsonify({'exists': exists})
 
 
 @app.route('/dashboard')
