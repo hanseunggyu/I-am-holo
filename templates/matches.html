@@ -1,0 +1,90 @@
+{% extends "base.html" %}
+{% block title %}매칭된 사용자{% endblock %}
+
+{% block content %}
+
+<style>
+  body {
+    background: linear-gradient(135deg, #f3e7f3, #d4e0f0);
+    font-family: 'Segoe UI', 'Pretendard', sans-serif;
+  }
+
+  .panel.left {
+    background-color: #e9d8fd;
+    padding: 2rem;
+    border-radius: 15px 0 0 15px;
+    color: #4a148c;
+    text-align: center;
+  }
+
+  .panel.right {
+    background-color: #fffdfc;
+    padding: 2.5rem 3rem;
+    border-radius: 0 15px 15px 0;
+    box-shadow: 0 0 10px rgba(0,0,0,0.05);
+  }
+
+  .card {
+    background-color: #fef5ff;
+    border: none;
+    border-radius: 15px;
+  }
+
+  .btn-purple {
+    background-color: #ba68c8;
+    color: white;
+  }
+
+  .btn-purple:hover {
+    background-color: #9c27b0;
+    color: white;
+  }
+
+  .match-card .card-body {
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+  }
+</style>
+
+<!-- 왼쪽 패널: 설명 -->
+<div class="panel left">
+  <h2>💑 매칭 현황</h2>
+  <p>서로 좋아요 한<br>인연들이 여기에 있어요 😊</p>
+</div>
+
+<!-- 오른쪽 패널: 매칭된 사용자 리스트 -->
+<div class="panel right">
+  <h2 class="mb-4 text-center">매칭된 사용자 목록</h2>
+
+  {% if matches %}
+    <div class="d-flex flex-column gap-3">
+      {% for m in matches %}
+        <div class="card match-card shadow-sm">
+          <div class="card-body">
+            <h5 class="card-title">닉네임: <strong>{{ m[0] }}</strong></h5>
+            <p class="card-text mb-2" style="line-height: 1.6;">
+              <strong>MBTI:</strong> {{ m[1] }}<br>
+              <strong>나이:</strong> {{ m[2] }}<br>
+              <strong>사는 곳:</strong> {{ m[3] }}<br>
+              <strong>동물:</strong> {{ m[4] }}<br>
+              <strong>인스타:</strong> {{ m[5] }}<br>
+              <strong>연락처:</strong> {{ m[6] }}<br>
+            </p>
+            <div class="text-end">
+              <a href="{{ url_for('chat', user_email=m[7]) }}" class="btn btn-purple btn-sm">💬 채팅하기</a>
+            </div>
+          </div>
+        </div>
+      {% endfor %}
+    </div>
+  {% else %}
+    <p class="text-muted text-center mt-5">😢 아직 매칭된 사람이 없습니다.<br>조금만 더 기다려보세요!</p>
+  {% endif %}
+
+  <div class="text-center mt-4">
+    <a href="{{ url_for('dashboard') }}" class="btn btn-secondary">← 대시보드로 돌아가기</a>
+  </div>
+</div>
+
+{% endblock %}
