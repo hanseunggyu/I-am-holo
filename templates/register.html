@@ -137,5 +137,41 @@
     </div>
   </div>
 </div>
+
+<script>
+document.getElementById("email").addEventListener("keyup", function () {
+  const email = this.value.trim();
+  const result = document.getElementById("email-result");
+
+  if (email.length === 0) {
+    result.textContent = "";
+    return;
+  }
+
+  const regex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+  if (!regex.test(email)) {
+    result.textContent = "📧 올바른 이메일 형식이 아닙니다.";
+    result.style.color = "red";
+    return;
+  }
+
+  fetch(`/check_email?email=${encodeURIComponent(email)}`)
+    .then(response => response.json())
+    .then(data => {
+      if (data.exists) {
+        result.textContent = "❌ 이미 가입된 이메일입니다.";
+        result.style.color = "red";
+      } else {
+        result.textContent = "✅ 사용 가능한 이메일입니다.";
+        result.style.color = "green";
+      }
+    })
+    .catch(err => {
+      console.error("이메일 확인 중 오류:", err);
+      result.textContent = "";
+    });
+});
+</script>
+
 {% endblock %}
 

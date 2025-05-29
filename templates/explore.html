@@ -69,6 +69,16 @@
           {% endfor %}
         </select>
       </div>
+
+      <!-- ✅ 정렬 기준 추가 -->
+      <div class="col-12">
+        <label class="form-label">정렬 기준</label>
+        <select name="sort_by" class="form-select">
+          <option value="recent" {% if request.form.get('sort_by') == 'recent' %}selected{% endif %}>최근등록순</option>
+          <option value="nickname" {% if request.form.get('sort_by') == 'nickname' %}selected{% endif %}>이름순</option>
+        </select>
+      </div>
+
       <div class="col-12 text-center">
         <button type="submit" class="btn btn-purple w-100">탐색하기</button>
       </div>
@@ -85,7 +95,7 @@
             {% if p['is_online'] %}
               <span class="text-success">🟢 활동중</span>
             {% else %}
-              <span class="text-muted">⚫ 휴식중</span>
+              <span class="text-muted">⛔ 휴식중</span>
             {% endif %}
             <p class="card-text" style="line-height: 1.5;">
               <strong>나이:</strong> {{ p['age'] }}세<br>

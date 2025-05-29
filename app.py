@@ -6,6 +6,7 @@ from flask_socketio import SocketIO, join_room, emit
 from datetime import datetime
 from user import user_bp
 from report import report_bp
+from auth import auth_bp
 from flask import request, jsonify
 
 
@@ -15,6 +16,7 @@ app.secret_key = "b'\xd8\x03\xfaW\xca\x01\x13\xf3..."  # 세션 키
 #blueprint 
 app.register_blueprint(user_bp)
 app.register_blueprint(report_bp)
+app.register_blueprint(auth_bp)
 
 # SocketIO 초기화
 socketio = SocketIO(app, cors_allowed_origins="*")
@@ -42,12 +44,47 @@ def register():
     if request.method == 'POST':
         email = request.form['email']
         password = request.form['password']
+
+        # 이메일 형식 확인 (정규표현식 사용)
+        import re
+        if not re.match(r'^[^@]+@[^@]+\.[^@]+$', email):
+            flash("❌ 올바르지 않은 이메일 형식입니다.", 'danger')
+            return redirect(url_for('register'))
+
+        # 이메일 중복 확인
+        conn = get_connection()
+        cursor = conn.cursor()
+        cursor.execute("SELECT id FROM users WHERE email = %s", (email,))
+        if cursor.fetchone():
+            cursor.close()
+            conn.close()
+            flash("❌ 이미 가입된 이메일입니다.", 'danger')
+            return redirect(url_for('register'))
+        cursor.close()
+        conn.close()
+
+        # 실제 회원 등록
         if register_user(email, password):
             session['email'] = email
-            return redirect(url_for('onboarding'))  # ✅ 수정됨!
+            return redirect(url_for('onboarding'))
         else:
-            return "❌ 회원가입 실패 (아이디 중복)"
+            flash("❌ 회원가입 중 알 수 없는 오류가 발생했습니다.", 'danger')
+            return redirect(url_for('register'))
+
     return render_template("register.html")
+
+
+@app.route('/check_email')
+def check_email():
+    email = request.args.get('email')
+    conn = get_connection()
+    cursor = conn.cursor()
+    cursor.execute("SELECT id FROM users WHERE email = %s", (email,))
+    exists = cursor.fetchone() is not None
+    cursor.close()
+    conn.close()
+    return jsonify({'exists': exists})
+
 
 @app.route('/onboarding', methods=['GET', 'POST'])
 def onboarding():
@@ -213,7 +250,6 @@ def edit_profile():
         keywords = request.form['keywords']
         phone = request.form['phone']
         instagram = request.form['instagram']
-        profile_img = request.form.get('profile_img_url') or None
 
         # ✅ 공개/비공개 설정 수집
         is_public = request.form.get('is_public') == '1'  # 문자열 '1' → True
@@ -223,10 +259,10 @@ def edit_profile():
             UPDATE profiles
             SET nickname=%s, mbti=%s, age=%s, gender=%s, job=%s, location=%s,
                 religion=%s, dream=%s, love_style=%s, preference=%s, keywords=%s,
-                phone=%s, instagram=%s, profile_img=%s, is_public=%s
+                phone=%s, instagram=%s, is_public=%s
             WHERE user_email=%s
         """, (nickname, mbti, age, gender, job, location, religion,
-              dream, love_style, preference, keywords, phone, instagram, profile_img, is_public, email))
+              dream, love_style, preference, keywords, phone, instagram, is_public, email))
 
         conn.commit()
         cursor.close()
@@ -281,36 +317,43 @@ def explore():
         return redirect(url_for('home'))
 
     conn = get_connection()
-    cursor = conn.cursor(dictionary=True)  # ✅ 딕셔너리 형태로 반환
+    cursor = conn.cursor(dictionary=True)
 
     gender = ''
     animal = ''
+    sort_by = 'recent'  # 기본 정렬은 최신순
     profiles = []
 
     # ✅ 내가 이미 좋아요한 사용자 리스트 가져오기
     cursor.execute("SELECT to_user FROM likes WHERE from_user = %s", (session['email'],))
-    liked_users = [row['to_user'] for row in cursor.fetchall()]  # ✅ row[0] → row['to_user']
+    liked_users = [row['to_user'] for row in cursor.fetchall()]
 
     if request.method == 'POST':
         gender = request.form.get('gender')
         animal = request.form.get('animal')
+        sort_by = request.form.get('sort_by', 'recent')  # 폼에서 정렬 기준 수신
 
-        query = """
+        # ✅ 정렬 기준 설정
+        sort_column = 'u.created_at' if sort_by == 'recent' else 'p.nickname'
+
+        # ✅ 탐색 쿼리 작성
+        query = f"""
         SELECT p.*, u.is_online
         FROM profiles p
         JOIN users u ON p.user_email = u.email
         WHERE p.user_email != %s AND p.is_public = TRUE
         """
-
-        params = [session['email']]  # 자기 자신은 제외
+        params = [session['email']]
 
         if gender:
-            query += " AND gender = %s"
+            query += " AND p.gender = %s"
             params.append(gender)
 
         if animal:
-            query += " AND animal_icon = %s"
+            query += " AND p.animal_icon = %s"
             params.append(animal)
+
+        query += f" ORDER BY {sort_column} ASC"
 
         cursor.execute(query, tuple(params))
         profiles = cursor.fetchall()
@@ -318,7 +361,14 @@ def explore():
     cursor.close()
     conn.close()
 
-    return render_template("explore.html", profiles=profiles, liked_users=liked_users)
+    return render_template("explore.html",
+                           profiles=profiles,
+                           liked_users=liked_users,
+                           gender=gender,
+                           animal_icon=animal,
+                           sort_by=sort_by)
+
+
 
 
 
