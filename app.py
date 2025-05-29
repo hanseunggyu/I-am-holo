@@ -1,3 +1,5 @@
+import eventlet
+eventlet.monkey_patch()
 from flask import Flask, render_template, request, redirect, url_for, session
 from auth import register_user, login_user
 from flask import flash
@@ -10,6 +12,7 @@ from auth import auth_bp
 from flask import request, jsonify
 from flask import Blueprint, request, session
 from db import get_connection
+
 
 app = Flask(__name__)
 app.secret_key = "b'\xd8\x03\xfaW\xca\x01\x13\xf3..."  # 세션 키
@@ -635,5 +638,9 @@ def main():
 
 
 if __name__ == '__main__':
-    # app.run(debug=True
-    socketio.run(app, debug=True)
+    socketio.run(
+        app,
+        host='127.0.0.1', port=5001,
+        debug=True,           
+        use_reloader=False    
+    )
