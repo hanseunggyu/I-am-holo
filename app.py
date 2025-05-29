@@ -8,7 +8,8 @@ from user import user_bp
 from report import report_bp
 from auth import auth_bp
 from flask import request, jsonify
-
+from flask import Blueprint, request, session
+from db import get_connection
 
 app = Flask(__name__)
 app.secret_key = "b'\xd8\x03\xfaW\xca\x01\x13\xf3..."  # 세션 키
@@ -17,6 +18,7 @@ app.secret_key = "b'\xd8\x03\xfaW\xca\x01\x13\xf3..."  # 세션 키
 app.register_blueprint(user_bp)
 app.register_blueprint(report_bp)
 app.register_blueprint(auth_bp)
+report_bp = Blueprint('report', __name__)
 
 # SocketIO 초기화
 socketio = SocketIO(app, cors_allowed_origins="*")
@@ -469,6 +471,25 @@ def chat(user_email):
         is_reported=is_reported
     )
 
+@report_bp.route('/report/<reported_email>', methods=['POST'])
+def report_user(reported_email):
+    reporter_email = session.get('email')
+    if not reporter_email:
+        return redirect(url_for('home'))
+
+    conn = get_connection()
+    cursor = conn.cursor()
+
+    # 신고 횟수 1 증가
+    cursor.execute("""
+        UPDATE profiles SET report_count = report_count + 1
+        WHERE user_email = %s
+    """, (reported_email,))
+    
+    conn.commit()
+    cursor.close()
+    conn.close()
+    return '', 200
 
 @socketio.on('join')
 def on_join(data):

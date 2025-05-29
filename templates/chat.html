@@ -44,7 +44,6 @@
     background-color: #155bd5;
   }
 
-  /* ✅ Toast 스타일 */
   #toast-container {
     position: fixed;
     top: 20px;
@@ -70,7 +69,6 @@
     100% { opacity: 0; transform: translateY(-10px); }
   }
 
-  /* ✅ 커스텀 모달 */
   .modal-overlay {
     position: fixed;
     top: 0; left: 0;
@@ -83,7 +81,7 @@
   }
 
   .modal-content {
-    max-width: 400px; 
+    max-width: 400px;
     width: 90%;
     background: #fff;
     padding: 20px 30px;
@@ -120,13 +118,24 @@
 <!-- ✅ Toast 영역 -->
 <div id="toast-container"></div>
 
-<!-- ✅ 커스텀 신고 모달 -->
+<!-- ✅ 신고 모달 -->
 <div id="report-modal" class="modal-overlay">
   <div class="modal-content">
     <p>이 사용자를 신고하시겠습니까?</p>
     <div class="modal-buttons">
       <button id="confirm-report" class="btn btn-warning">확인</button>
       <button id="cancel-report" class="btn btn-secondary">취소</button>
+    </div>
+  </div>
+</div>
+
+<!-- ✅ 매칭취소 모달 -->
+<div id="unmatch-modal" class="modal-overlay">
+  <div class="modal-content">
+    <p>정말 매칭을 취소하시겠습니까?</p>
+    <div class="modal-buttons">
+      <button id="confirm-unmatch" class="btn btn-warning">확인</button>
+      <button id="cancel-unmatch" class="btn btn-secondary">취소</button>
     </div>
   </div>
 </div>
@@ -159,47 +168,18 @@
       <button type="submit" class="btn btn-outline-secondary w-100">채팅방 나가기</button>
     </form>
 
-    <form action="{{ url_for('unmatch', user_email=user_email) }}" method="POST" onsubmit="return confirm('정말 매칭을 취소하시겠습니까?')">
-      <button type="submit" class="btn btn-outline-danger w-100">❌ 매칭 취소</button>
+    <form id="unmatch-form" action="{{ url_for('unmatch', user_email=user_email) }}" method="POST">
+      <button type="button" class="btn btn-outline-danger w-100" id="unmatch-button">❌ 매칭 취소</button>
     </form>
 
-    <!-- 🚩 신고하기 버튼 -->
     <form id="report-form" action="{{ url_for('report.report_user', reported_email=user_email) }}" method="POST">
       <button type="submit" class="btn btn-outline-warning w-100">🚩 신고하기</button>
     </form>
   </div>
 </div>
 
-<!-- ✅ Toast 및 신고 모달 처리 -->
+<!-- ✅ Toast 및 모달 Script -->
 <script>
-  const reportForm = document.getElementById('report-form');
-  const modal = document.getElementById('report-modal');
-  const confirmBtn = document.getElementById('confirm-report');
-  const cancelBtn = document.getElementById('cancel-report');
-
-  reportForm.addEventListener('submit', function(e) {
-    e.preventDefault();
-    modal.style.display = 'flex';
-  });
-
-  cancelBtn.addEventListener('click', function() {
-    modal.style.display = 'none';
-  });
-
-  confirmBtn.addEventListener('click', function() {
-    fetch(reportForm.action, {
-      method: 'POST',
-      headers: {
-        'Content-Type': 'application/x-www-form-urlencoded'
-      }
-    }).then(response => {
-      if (response.ok) {
-        showToast('🚨 신고했습니다!');
-      }
-    });
-    modal.style.display = 'none';
-  });
-
   function showToast(message) {
     const container = document.getElementById('toast-container');
     const toast = document.createElement('div');
@@ -210,16 +190,53 @@
       toast.remove();
     }, 3000);
   }
+
+  // 신고 모달
+  const reportForm = document.getElementById('report-form');
+  const reportModal = document.getElementById('report-modal');
+  document.getElementById('cancel-report').onclick = () => reportModal.style.display = 'none';
+  document.getElementById('confirm-report').onclick = () => {
+    fetch(reportForm.action, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/x-www-form-urlencoded' }
+    }).then(res => {
+      if (res.ok) showToast('🚨 신고했습니다!');
+    });
+    reportModal.style.display = 'none';
+  };
+  reportForm.onsubmit = (e) => {
+    e.preventDefault();
+    reportModal.style.display = 'flex';
+  };
+
+  // 매칭 취소 모달
+  const unmatchForm = document.getElementById('unmatch-form');
+  const unmatchModal = document.getElementById('unmatch-modal');
+  document.getElementById('unmatch-button').onclick = () => unmatchModal.style.display = 'flex';
+  document.getElementById('cancel-unmatch').onclick = () => unmatchModal.style.display = 'none';
+  document.getElementById('confirm-unmatch').onclick = () => {
+    fetch(unmatchForm.action, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/x-www-form-urlencoded' }
+    }).then(res => {
+      if (res.ok) {
+        showToast('❌ 매칭이 취소되었습니다.');
+        setTimeout(() => window.location.href = "{{ url_for('matches') }}", 1500);
+      } else {
+        showToast('⚠️ 매칭 취소 실패');
+      }
+    }).catch(() => showToast('⚠️ 서버 오류 발생'));
+    unmatchModal.style.display = 'none';
+  };
 </script>
 
-<!-- ✅ 실시간 채팅 처리 -->
+<!-- ✅ 실시간 채팅 -->
 <script src="https://cdnjs.cloudflare.com/ajax/libs/socket.io/4.5.4/socket.io.min.js" crossorigin="anonymous"></script>
 <script>
   const socket = io();
   const myEmail = "{{ my_email }}";
   const userEmail = "{{ user_email }}";
   const room = [myEmail, userEmail].sort().join("_");
-
   socket.emit('join', { my_email: myEmail, user_email: userEmail });
 
   document.getElementById('chat-form').addEventListener('submit', function(e) {
@@ -227,11 +244,7 @@
     const input = document.getElementById('msg-input');
     const msg = input.value.trim();
     if (!msg) return;
-    socket.emit('send_message', {
-      my_email: myEmail,
-      user_email: userEmail,
-      message: msg
-    });
+    socket.emit('send_message', { my_email: myEmail, user_email: userEmail, message: msg });
     input.value = '';
   });
 
@@ -245,4 +258,5 @@
   });
 </script>
 {% endblock %}
+
 
