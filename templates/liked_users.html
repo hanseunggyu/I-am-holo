@@ -63,6 +63,10 @@
   <h2 class="mb-4 text-center fw-bold">💖 내가 좋아요한 사람</h2>
 
   {% if liked %}
+    {% set emoji_map = {
+      '사자': '🦁', '원숭이': '🐒', '공룡': '🦖', '여우': '🦊', '토끼': '🐰',
+      '강아지': '🐶', '고양이': '🐱', '다람쥐': '🐿️', '사슴': '🦌'
+    } %}
     <div class="d-flex flex-column gap-4">
       {% for p in liked %}
         <div class="card shadow-sm">
@@ -76,7 +80,8 @@
               <strong>직업:</strong> {{ p[5] }}<br>
               <strong>종교:</strong> {{ p[6] }}<br>
               <strong>꿈:</strong> {{ p[7] }}<br>
-              <strong>연애관:</strong> {{ p[8] }}
+              <strong>연애관:</strong> {{ p[8] }}<br>
+              <strong>동물:</strong> {{ emoji_map.get(p[10], '') }} {{ p[10] }}
             </p>
             <div class="text-end mt-2">
               <button class="btn btn-outline-danger btn-sm" onclick="unlikeUser('{{ p[9] }}', this)">💔 좋아요 취소</button>
@@ -140,7 +145,3 @@
 </script>
 
 {% endblock %}
-
-
-
-

@@ -303,7 +303,8 @@ def liked_users():
         p.religion,        -- p[6] ← 종교
         p.dream,           -- p[7] ← 꿈
         p.love_style,       -- p[8] ← 연애관
-        p.user_email       -- p[9]
+        p.user_email,       -- p[9]
+        p.animal_icon      -- ✅ 추가됨 → p[10]
     FROM profiles p
     JOIN likes l ON p.user_email = l.to_user
     WHERE l.from_user = %s
@@ -358,7 +359,7 @@ def explore():
             query += " AND p.animal_icon = %s"
             params.append(animal)
 
-        query += f" ORDER BY {sort_column} ASC"
+        query += f" ORDER BY {sort_column} DESC"
 
         cursor.execute(query, tuple(params))
         profiles = cursor.fetchall()

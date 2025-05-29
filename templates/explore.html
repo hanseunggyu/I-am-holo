@@ -9,7 +9,7 @@
 
   .panel.left {
     background-color: #e9d8fd;
-    padding: 2rem;
+    padding: 2rem; 
     border-radius: 15px 0 0 15px;
     color: #4a148c;
   }
@@ -64,8 +64,14 @@
         <label class="form-label">동물 아이콘</label>
         <select name="animal" class="form-select">
           <option value="">전체</option>
-          {% for animal in ['사자','원숭이','공룡','여우','토끼','강아지','고양이','다람쥐','사슴','곰'] %}
-          <option value="{{ animal }}" {% if request.form.get('animal') == animal %}selected{% endif %}>{{ animal }}</option>
+          {% set animals = {
+            '🦁': '사자', '🐒': '원숭이', '🦖': '공룡', '🦊': '여우', '🐰': '토끼',
+            '🐶': '강아지', '🐱': '고양이', '🐿️': '다람쥐', '🦌': '사슴'
+          } %}
+          {% for emoji, label in animals.items() %}
+            <option value="{{ label }}" {% if request.form.get('animal') == label %}selected{% endif %}>
+              {{ emoji }} {{ label }}
+            </option>
           {% endfor %}
         </select>
       </div>
@@ -88,6 +94,10 @@
   <!-- 프로필 목록 -->
   <div style="overflow-y: auto; max-height: 60vh; padding-right: 10px; flex-grow: 1;">
     {% if profiles %}
+      {% set emoji_map = {
+        '사자': '🦁', '원숭이': '🐒', '공룡': '🦖', '여우': '🦊', '토끼': '🐰',
+        '강아지': '🐶', '고양이': '🐱', '다람쥐': '🐿️', '사슴': '🦌'
+      } %}
       {% for p in profiles %}
         <div class="card mb-3 shadow-sm" style="border-radius: 15px;">
           <div class="card-body">
@@ -99,7 +109,7 @@
             {% endif %}
             <p class="card-text" style="line-height: 1.5;">
               <strong>나이:</strong> {{ p['age'] }}세<br>
-              <strong>동물:</strong> {{ p['animal_icon'] }}<br>
+              <strong>동물:</strong> {{ emoji_map.get(p['animal_icon'], '') }} {{ p['animal_icon'] }}<br>
               <strong>MBTI:</strong> {{ p['mbti'] }}<br>
               <strong>사는 곳:</strong> {{ p['location'] }}<br>
               <strong>꿈/목표:</strong> {{ p['dream'] }}<br>
@@ -173,6 +183,4 @@
       });
   }
 </script>
-
 {% endblock %}
-

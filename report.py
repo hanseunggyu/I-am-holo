@@ -43,4 +43,4 @@ def is_reported_many_times(user_email):
     count = cursor.fetchone()[0]
     cursor.close()
     conn.close()
-    return count >= 1
+    return count >= 2
