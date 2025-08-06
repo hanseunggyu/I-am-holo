@@ -1,4 +1,5 @@
-# mini-project1 <br>
+# 신세계아이앤씨 클라우드 엔지니어 교육과정 5차수
+# Mini-project1 <br>
 project name : I-am-holo <br>
 
 Python 3.13.3 <br>
